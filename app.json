@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "React Native Todo App",
+    "description": "This is a simple Todo app build along with a tutorial which you can find at ",
     "slug": "simple-todo-native",
     "privacy": "public",
     "sdkVersion": "32.0.0",
@@ -23,7 +24,11 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.shalomsam.rntodo"
+    },
+    "android": {
+      "package": "com.shalomsam.rntodo"
     }
   }
 }
