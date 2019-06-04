@@ -1,0 +1,66 @@
+// TYPES
+type CurrentTimestamp extends Number {
+  validate() { this == now }
+}
+
+type InitialTimestamp extends Number {
+  validate() { initial(this, now) }
+}
+
+type User {
+    uid: String,
+    email: String,
+    lists: Object
+}
+
+type List {
+    key: String,
+    name: String,
+    owner: String,
+    userEmails: Object,
+    todos: Object | Null
+}
+
+type Todo {
+    key: String,
+    title: String,
+    completed: Boolean,
+    notes: String,
+    remindMe: Boolean,
+    createdOn: Number,
+    completedOn: InitialTimestamp,
+    dueDate: InitialTimestamp
+}
+
+// FUNCTIONS
+initial(value, init) { value == (prior(value) == null ? init : prior(value)) }
+
+isMember(userId, listId) {
+    root.child('users').child(userId).child('lists').child(listId) != null
+}
+
+// PATHS
+path /users/{uid} is User {
+    read() { auth !== null }
+    write() { auth !== null && auth.uid === uid }
+}
+
+path /lists/{listId} is List {
+    read() {
+        isMember(auth.uid, listId)
+    }
+    write() {
+        isMember(auth.uid, listId)
+    }
+}
+
+path /lists/{listId}/todos {
+    read() {
+        isMember(auth.uid, listId)
+    }
+    write() {
+        isMember(auth.uid, listId)
+    }
+}
+
+path /lists/{listId}/todos/{todoId} is Todo {}

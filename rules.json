@@ -1,0 +1,80 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".validate": "newData.hasChildren(['uid', 'email', 'lists'])",
+        "uid": {
+          ".validate": "newData.isString()"
+        },
+        "email": {
+          ".validate": "newData.isString()"
+        },
+        "lists": {
+          ".validate": "newData.hasChildren()"
+        },
+        "$other": {
+          ".validate": "false"
+        },
+        ".read": "auth != null",
+        ".write": "(auth != null && auth.uid == $uid)"
+      }
+    },
+    "lists": {
+      "$listId": {
+        ".validate": "newData.hasChildren(['key', 'name', 'owner', 'userEmails'])",
+        "key": {
+          ".validate": "newData.isString()"
+        },
+        "name": {
+          ".validate": "newData.isString()"
+        },
+        "owner": {
+          ".validate": "newData.isString()"
+        },
+        "userEmails": {
+          ".validate": "newData.hasChildren()"
+        },
+        "todos": {
+          ".validate": "newData.hasChildren()",
+          ".read": "root.child('users').child(auth.uid).child('lists').child($listId).exists()",
+          ".write": "root.child('users').child(auth.uid).child('lists').child($listId).exists()",
+          "$todoId": {
+            ".validate": "newData.hasChildren([])",
+            "key": {
+              ".validate": "newData.isString()"
+            },
+            "title": {
+              ".validate": "newData.isString()"
+            },
+            "completed": {
+              ".validate": "newData.isBoolean()"
+            },
+            "notes": {
+              ".validate": "newData.isString()"
+            },
+            "remindMe": {
+              ".validate": "newData.isBoolean()"
+            },
+            "createdOn": {
+              ".validate": "newData.isNumber()"
+            },
+            "completedOn": {
+              ".validate": "(newData.isNumber() && newData.val() == (data.val() == null ? now : data.val()))"
+            },
+            "dueDate": {
+              ".validate": "(newData.isNumber() && newData.val() == (data.val() == null ? now : data.val()))"
+            },
+            "$other": {
+              ".validate": "false"
+            }
+          }
+        },
+        "$other": {
+          ".validate": "false"
+        },
+        ".read": "root.child('users').child(auth.uid).child('lists').child($listId).exists()",
+        ".write": "root.child('users').child(auth.uid).child('lists').child($listId).exists()"
+      }
+    }
+  }
+}

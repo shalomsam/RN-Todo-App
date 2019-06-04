@@ -5,6 +5,15 @@ class User extends Database {
   signup = async (email, password) => {
     try {
       const response = await this.app.auth().createUserWithEmailAndPassword(email, password);
+      this.app.auth().onAuthStateChanged((currentUser) => {
+        const userRef = `users/${currentUser.uid}/`;
+        const profile = {
+          uid: currentUser.uid,
+          name: currentUser.displayName,
+          email: currentUser.email,
+        };
+        this.database.ref(userRef).set(profile);
+      });
       return this._success(response);
     } catch (e) {
       return this._error(e);

@@ -7,6 +7,8 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo';
 import PropTypes from 'prop-types';
+import uuid from 'uuid/v4';
+import md5 from 'md5';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { TextInput } from 'react-native-paper';
@@ -25,8 +27,8 @@ export default class TaskLists extends React.Component {
       key: null,
       name: null,
       owner: null,
-      userEmails: [],
-      todos: [],
+      userEmails: {},
+      todos: {},
     };
 
     this.state = {
@@ -46,8 +48,13 @@ export default class TaskLists extends React.Component {
       .then((data) => {
         const currentUser = JSON.parse(data);
         const { listItem } = this.state;
+        const { userEmails } = listItem;
         listItem.owner = currentUser.email;
-        listItem.userEmails.push(currentUser.email);
+        // listItem.userEmails.push(currentUser.email);
+        const emailKey = md5(currentUser.email);
+
+        userEmails[emailKey] = this.addUnverifiedUserToList(emailKey, currentUser.email);
+
         this.setState({ listItem, currentUser });
 
         todosDb.getTodoList(currentUser.uid).then((list) => {
@@ -86,17 +93,20 @@ export default class TaskLists extends React.Component {
 
   showAddedEmails = () => {
     const { listItem } = this.state;
-    return listItem.userEmails.map((email, i) => {
-      let owner = null;
-      const key = `email-${i}`;
+    const { userEmails } = listItem;
+    const emailKeys = Object.keys(userEmails);
 
-      if (email === listItem.owner) {
+    return emailKeys.map((emailKey) => {
+      let owner = null;
+      const listUser = userEmails[emailKey];
+
+      if (listUser.email === listItem.owner) {
         owner = <Text>Owner</Text>;
       }
       return (
-        <View key={key}>
+        <View key={emailKey}>
           <Text>
-            {email}
+            {listUser.email}
             {owner}
           </Text>
         </View>
@@ -106,11 +116,22 @@ export default class TaskLists extends React.Component {
 
   addEmailToList = () => {
     const { listItem } = this.state;
+    const { userEmails } = listItem;
     let { email } = this.state;
-    listItem.userEmails.push(email);
+    const emailKey = md5(email);
+
+    userEmails[emailKey] = this.addUnverifiedUserToList(emailKey, email);
+    listItem.userEmails = userEmails;
     email = '';
     this.setState({ listItem, email });
   }
+
+  addUnverifiedUserToList = (key, email, isSignedUp = false, deepLink = '') => ({
+    key,
+    email,
+    isSignedUp,
+    deepLink,
+  })
 
   createAndAddList = async () => {
     this.setState({ createBtnLoading: true });
@@ -118,16 +139,20 @@ export default class TaskLists extends React.Component {
     const { listItem, currentUser } = this.state;
     let { list } = this.state;
 
-    listItem.key = listItem.name.toLowerCase().replace(' ', '-');
+    listItem.key = uuid();
     list = list || {};
     list[listItem.key] = listItem;
 
     try {
-      await todosDb.addTodoList(listItem, currentUser.uid);
+      await todosDb.addTodoList(listItem, currentUser.uid, listItem.key);
       this.setState({
+        email: '',
         list,
         createBtnLoading: false,
-        listItem: this.listDefault,
+        listItem: {
+          ...this.listDefault,
+          name: null,
+        },
         showAddNewListModal: false,
       });
     } catch (e) {

@@ -13,23 +13,26 @@ const styles = StyleSheet.create({
 });
 
 const Todos = (props) => {
-  let todos = <Text style={styles.noTodo}>No TODOs</Text>;
-  if (props.todos !== undefined && props.todos.length) {
-    todos = props.todos.map((item, i) => {
-      const key = `todo-${i}`;
+  const { todos, checkBoxToggle, onDelete } = props;
+  let todosEl = <Text style={styles.noTodo}>No TODOs</Text>;
+
+  if (todos !== undefined) {
+    const todoKeys = Object.keys(todos);
+    todosEl = todoKeys.map((todoKey) => {
+      const todo = todos[todoKey];
       return (
         <Todo
-          key={key}
-          index={i}
-          title={item.title}
-          completed={item.completed}
-          checkBoxToggle={props.checkBoxToggle}
-          onDelete={props.onDelete}
+          key={todo.key}
+          id={todo.key}
+          title={todo.title}
+          completed={todo.completed}
+          checkBoxToggle={checkBoxToggle}
+          onDelete={onDelete}
         />
       );
     });
   }
-  return todos;
+  return todosEl;
 };
 
 export default Todos;

@@ -9,6 +9,7 @@ import { LinearGradient } from 'expo';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { FontAwesome } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
+import md5 from 'md5';
 import { styles as GlobalStyles } from '../utils/styles';
 import Header from '../components/UI/Header';
 import Todos from '../components/Todos/Todos';
@@ -41,6 +42,9 @@ export default class Tasks extends React.Component {
   constructor(props) {
     super(props);
 
+    this.FILTER_ALL = 'all';
+    this.FILTER_ACTIVE = 'active';
+    this.FILTER_COMPLETE = 'completed';
     this.filters = ['all', 'active', 'completed'];
 
     this.state = {
@@ -50,8 +54,9 @@ export default class Tasks extends React.Component {
       selectedList: {
         key: null,
         name: null,
-        userEmails: [],
-        todos: [],
+        owner: null,
+        userEmails: {},
+        todos: {},
       },
     };
   }
@@ -74,12 +79,14 @@ export default class Tasks extends React.Component {
 
   addTodo = () => {
     const { todo, selectedList } = this.state;
-    const todos = selectedList.todos || [];
+    const todos = selectedList.todos || {};
     if (todo.length === 0) {
       // this.setState({ inputError: true });
       return;
     }
+    const todoKey = md5(todo);
     const todoNew = {
+      key: todoKey,
       title: todo,
       completed: false,
       createdOn: Date.now(),
@@ -88,43 +95,51 @@ export default class Tasks extends React.Component {
       remindMe: false,
       completedOn: null,
     };
-    todos.push(todoNew);
+
+    todos[todoKey] = todoNew;
     selectedList.todos = todos;
     this.setState({ selectedList, todo: '' }, this.save);
   };
 
-  checkBoxToggle = (i) => {
+  checkBoxToggle = (todoKey) => {
     const { selectedList } = this.state;
-    const todo = selectedList.todos[i];
+    const todo = selectedList.todos[todoKey];
 
     todo.completed = !todo.completed;
     todo.completedOn = todo.completed ? Date.now() : null;
-    selectedList.todos[i] = todo;
+    selectedList.todos[todoKey] = todo;
     this.setState({ selectedList }, this.save);
   };
 
-  onDeleteAction = (i) => {
+  onDeleteAction = (todoKey) => {
     const { selectedList } = this.state;
-    selectedList.todos.splice(i, 1);
+    delete selectedList.todos[todoKey];
     this.setState({ selectedList }, this.save);
   };
 
   deleteAllContinue = () => {
-    const { currentFilter, selectedList } = this.state;
+    const { selectedList } = this.state;
+    const { todos } = selectedList;
 
-    let todosFiltered = [];
-    if (currentFilter !== 'all') {
-      todosFiltered = selectedList.todos.filter((todo) => {
-        if (currentFilter === 'active') {
-          return todo.completed === true;
-        }
+    const todoKeys = Object.keys(todos);
+    todoKeys.map((todoKey) => {
+      if (this._shouldDeleteTodo(todos[todoKey])) {
+        delete todos[todoKey];
+      }
 
-        return todo.completed === false;
-      });
-    }
+      return null;
+    });
 
-    selectedList.todos = todosFiltered;
+    selectedList.todos = todos;
     this.setState({ selectedList, currentFilter: 'all' }, this.save);
+  }
+
+  _shouldDeleteTodo = (todo) => {
+    const { currentFilter } = this.state;
+
+    return (currentFilter === this.FILTER_ACTIVE && !todo.completed)
+      || (currentFilter === this.FILTER_COMPLETE && todo.completed)
+      || currentFilter === this.FILTER_ALL;
   }
 
   deleteAllCancel = () => {
@@ -142,11 +157,14 @@ export default class Tasks extends React.Component {
     let { todos } = selectedList;
 
     if (currentFilter !== 'all') {
-      todos = todos.filter((item) => {
-        if (currentFilter === 'active') {
-          return item.completed === false;
+      const todoKeys = Object.values(todos);
+      todos = {};
+      todoKeys.map((_todo) => {
+        if ((currentFilter === this.FILTER_ACTIVE && _todo.completed === false)
+          || (currentFilter === this.FILTER_COMPLETE && _todo.completed)) {
+          todos[_todo.key] = _todo;
         }
-        return item.completed === true;
+        return null;
       });
     }
 

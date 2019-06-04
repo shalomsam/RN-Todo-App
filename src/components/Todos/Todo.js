@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
 const Todo = (props) => {
   const {
     completed,
-    index,
+    id,
     checkBoxToggle,
     title,
     onDelete,
@@ -57,7 +57,7 @@ const Todo = (props) => {
         name={todoCheckIcon}
         size={GlobalStyles.iconSize}
         color={todoCheckIconColor}
-        onPress={() => checkBoxToggle(index)}
+        onPress={() => checkBoxToggle(id)}
       />
       <Text style={titleStyle}>{title}</Text>
       {completed
@@ -67,7 +67,7 @@ const Todo = (props) => {
             name="delete-forever"
             size={GlobalStyles.iconSize}
             color="red"
-            onPress={() => onDelete(index)}
+            onPress={() => onDelete(id)}
           />
         )
       }
@@ -77,7 +77,7 @@ const Todo = (props) => {
 
 Todo.propTypes = {
   completed: PropTypes.bool.isRequired,
-  index: PropTypes.number.isRequired,
+  id: PropTypes.string.isRequired,
   checkBoxToggle: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   onDelete: PropTypes.func.isRequired,
