@@ -1,7 +1,7 @@
 import uuid from 'uuid/v4';
 import Database from './Database';
 
-class Todos extends Database {
+class Lists extends Database {
   getTodoList = async (userId) => {
     const userListsRef = `users/${userId}/lists`;
     const userListSnapshot = await this.database.ref(userListsRef).once('value');
@@ -44,6 +44,28 @@ class Todos extends Database {
     }
   }
 
+  updateTodoList = async (list) => {
+    try {
+      const listRef = `lists/${list.key}`;
+      return await this.database.ref(listRef).update(list);
+    } catch (e) {
+      console.log('updateTodoList error >>', e);
+      return null;
+    }
+  }
+
+  deleteTodoList = async (listId, userId) => {
+    const listRef = `lists/${listId}`;
+    const userListsRef = `users/${userId}/lists/${listId}`;
+
+    return this.database.ref(listRef).remove()
+      .then(() => this.database.ref(userListsRef).remove())
+      .catch((e) => {
+        console.log(e);
+        return null;
+      });
+  }
+
   getTodos = async (listId) => {
     // const listsRefKey = `user/${userId}/lists/`;
     const refKey = `lists/${listId}/todos`;
@@ -61,9 +83,19 @@ class Todos extends Database {
       return false;
     }
     const refKey = `lists/${list.key}/todos`;
-    return this.database.ref(refKey).set(list.todos);
+    return this.database.ref(refKey).update(list.todos);
+  }
+
+  updateTodo = (todoId, listId, todo) => {
+    const refKey = `lists/${listId}/todos/${todoId}`;
+    return this.database.ref(refKey).update(todo);
+  }
+
+  deleteTodo = (todoId, listId) => {
+    const refKey = `lists/${listId}/todos/${todoId}`;
+    return this.database.ref(refKey).remove();
   }
 }
 
-const todos = new Todos();
+const todos = new Lists();
 export default todos;

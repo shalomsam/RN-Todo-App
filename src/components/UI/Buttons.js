@@ -18,7 +18,8 @@ export default class Buttons extends React.PureComponent {
       textStyle,
     } = this.props;
     const btnStyle = type || 'primary';
-    const txtStyle = textStyle || (btnStyle === 'default' ? buttons.textDark : buttons.textLight);
+    // eslint-disable-next-line no-nested-ternary
+    const txtStyle = textStyle || (btnStyle === 'default' ? buttons.textDark : (btnStyle === 'link' ? buttons.textLink : buttons.textLight));
     return (
       <View>
         {prependIcon || null}
@@ -54,7 +55,7 @@ export default class Buttons extends React.PureComponent {
 
 Buttons.propTypes = {
   title: PropTypes.string.isRequired,
-  type: PropTypes.oneOf(['primary', 'secondary', 'tertiary', 'default']),
+  type: PropTypes.oneOf(['primary', 'secondary', 'tertiary', 'link', 'default']),
   style: PropTypes.object,
   textStyle: PropTypes.object,
   onPress: PropTypes.func.isRequired,

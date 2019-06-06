@@ -11,10 +11,10 @@ import uuid from 'uuid/v4';
 import md5 from 'md5';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { TextInput } from 'react-native-paper';
+import { TextInput, ActivityIndicator } from 'react-native-paper';
 import { styles, colors, textInputs } from '../utils/styles';
 import List from '../components/List/List';
-import todosDb from '../database/Todos';
+import ListsDb from '../database/Lists';
 import Header from '../components/UI/Header';
 import Buttons from '../components/UI/Buttons';
 import SimpleModal from '../components/Modals/SimpleModal';
@@ -40,6 +40,7 @@ export default class TaskLists extends React.Component {
       email: '',
       createBtnLoading: false,
       currentUser: null,
+      loading: true,
     };
   }
 
@@ -57,9 +58,10 @@ export default class TaskLists extends React.Component {
 
         this.setState({ listItem, currentUser });
 
-        todosDb.getTodoList(currentUser.uid).then((list) => {
+        ListsDb.getTodoList(currentUser.uid).then((list) => {
           this.setState({
             list,
+            loading: false,
           });
         }).catch((e) => {
           console.log('TaskList CDM error >>', e);
@@ -73,7 +75,16 @@ export default class TaskLists extends React.Component {
   onPressAction = (item) => {
     const { navigation } = this.props;
     const { currentUser } = this.state;
-    navigation.navigate('Todos', { currentUser, selectedList: item });
+    navigation.navigate('Todos', { currentUser, selectedList: item, deleteListAction: this.deleteList });
+  }
+
+  deleteList = (listId) => {
+    const { currentUser, list } = this.state;
+    ListsDb.deleteTodoList(listId, currentUser.uid)
+      .then(() => {
+        delete list[listId];
+        this.setState(list);
+      });
   }
 
   showAddNewList = () => {
@@ -122,6 +133,7 @@ export default class TaskLists extends React.Component {
 
     userEmails[emailKey] = this.addUnverifiedUserToList(emailKey, email);
     listItem.userEmails = userEmails;
+    ListsDb.updateTodoList(listItem);
     email = '';
     this.setState({ listItem, email });
   }
@@ -144,7 +156,7 @@ export default class TaskLists extends React.Component {
     list[listItem.key] = listItem;
 
     try {
-      await todosDb.addTodoList(listItem, currentUser.uid, listItem.key);
+      await ListsDb.addTodoList(listItem, currentUser.uid, listItem.key);
       this.setState({
         email: '',
         list,
@@ -169,6 +181,7 @@ export default class TaskLists extends React.Component {
       emailErr,
       email,
       createBtnLoading,
+      loading,
     } = this.state;
 
     let listLen = 0;
@@ -179,7 +192,19 @@ export default class TaskLists extends React.Component {
       listLen = keys.length;
     }
 
-    if (listLen === 0) {
+    if (loading) {
+      content = (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <ActivityIndicator size={30} color="white" />
+        </View>
+      );
+    } else if (listLen === 0) {
       content = this.renderAddListButton();
     } else {
       content = <List items={list} onPressAction={this.onPressAction} />;

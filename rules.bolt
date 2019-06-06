@@ -28,8 +28,8 @@ type Todo {
     notes: String,
     remindMe: Boolean,
     createdOn: Number,
-    completedOn: InitialTimestamp,
-    dueDate: InitialTimestamp
+    completedOn: Number | Null,
+    dueDate: Number | Null
 }
 
 // FUNCTIONS

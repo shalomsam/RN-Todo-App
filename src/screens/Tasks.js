@@ -1,28 +1,32 @@
 import React from 'react';
 import {
   View,
+  Text,
   TextInput,
   StyleSheet,
   ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
 import md5 from 'md5';
-import { styles as GlobalStyles } from '../utils/styles';
+import { styles } from '../utils/styles';
 import Header from '../components/UI/Header';
 import Todos from '../components/Todos/Todos';
 import Filter from '../components/Filter/Filter';
-import TodosDb from '../database/Todos';
+import ListsDb from '../database/Lists';
+import SimpleModal from '../components/Modals/SimpleModal';
+import Switch from '../components/SwitchCase/Switch';
+import Buttons from '../components/UI/Buttons';
 
 
-const styles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   container: {
     padding: 10,
   },
   textInput: {
-    color: GlobalStyles.fontColor,
+    color: styles.fontColor,
     fontSize: 28,
     fontStyle: 'italic',
   },
@@ -30,7 +34,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   listHeader: {
-    fontSize: GlobalStyles.fontSize,
+    fontSize: styles.fontSize,
     color: 'rgba(255, 255, 255, 0.7)',
   },
   todosWrp: {
@@ -46,8 +50,17 @@ export default class Tasks extends React.Component {
     this.FILTER_ACTIVE = 'active';
     this.FILTER_COMPLETE = 'completed';
     this.filters = ['all', 'active', 'completed'];
+    this.listOptions = {
+      DEFAULT: 'default',
+      DELETE: 'delete',
+      RENAME: 'rename',
+      ADDEMAIL: 'add-email',
+      REMINDER: 'reminder',
+    };
+    this.deleteListAction = null;
 
     this.state = {
+      showListOptions: false,
       todo: '',
       currentFilter: 'all',
       currentUser: null,
@@ -58,6 +71,8 @@ export default class Tasks extends React.Component {
         userEmails: {},
         todos: {},
       },
+      route: this.listOptions.DEFAULT,
+      emailInput: '',
     };
   }
 
@@ -65,13 +80,14 @@ export default class Tasks extends React.Component {
     const { navigation } = this.props;
     const list = navigation.getParam('selectedList');
     const currentUser = navigation.getParam('currentUser');
+    this.deleteListAction = navigation.getParam('deleteListAction');
     this.setState({ selectedList: list, currentUser });
   }
 
   save = async () => {
     const { selectedList, currentUser } = this.state;
     try {
-      TodosDb.setTodos(selectedList, currentUser.uid);
+      ListsDb.setTodos(selectedList, currentUser.uid);
     } catch (e) {
       console.log('Error while storing Todo Items >', e);
     }
@@ -103,11 +119,13 @@ export default class Tasks extends React.Component {
 
   checkBoxToggle = (todoKey) => {
     const { selectedList } = this.state;
-    const todo = selectedList.todos[todoKey];
+    const { todos } = selectedList;
+    const todo = todos[todoKey];
 
     todo.completed = !todo.completed;
     todo.completedOn = todo.completed ? Date.now() : null;
-    selectedList.todos[todoKey] = todo;
+    todos[todoKey] = todo;
+    selectedList.todos = todos;
     this.setState({ selectedList }, this.save);
   };
 
@@ -151,10 +169,80 @@ export default class Tasks extends React.Component {
     this.setState({ currentFilter: filter });
   }
 
+  showListOptions = () => {
+    this.setState({ showListOptions: true });
+  }
+
+  deleteList = () => {
+    const { selectedList } = this.state;
+    const { navigation } = this.props;
+    // TodosDb.deleteTodoList(selectedList.key, currentUser.uid);
+    this.deleteListAction(selectedList.key);
+    navigation.navigate('TaskLists');
+  }
+
+  updateList = () => {
+    const { selectedList } = this.state;
+    ListsDb.updateTodoList(selectedList);
+    this.setState({ showListOptions: false });
+  }
+
+  showAddedEmails = () => {
+    const { selectedList } = this.state;
+    const { userEmails } = selectedList;
+    const emailKeys = Object.keys(userEmails);
+
+    return emailKeys.map((emailKey) => {
+      let owner = null;
+      const listUser = userEmails[emailKey];
+
+      if (listUser.email === selectedList.owner) {
+        owner = <Text>Owner</Text>;
+      }
+      return (
+        <View key={emailKey}>
+          <Text>
+            {listUser.email}
+          </Text>
+          <Text>
+            {owner}
+          </Text>
+        </View>
+      );
+    });
+  }
+
+  addEmailToList = () => {
+    const { selectedList } = this.state;
+    const { userEmails } = selectedList;
+    let { emailInput } = this.state;
+    const emailKey = md5(emailInput);
+
+    userEmails[emailKey] = this.addUnverifiedUserToList(emailKey, emailInput);
+    selectedList.userEmails = userEmails;
+    ListsDb.updateTodoList(selectedList);
+    emailInput = '';
+    this.setState({ selectedList, emailInput });
+  }
+
   render() {
     const { navigation } = this.props;
-    const { currentFilter, todo, selectedList } = this.state;
+    const {
+      currentFilter,
+      todo,
+      showListOptions,
+      selectedList,
+      route,
+      emailInput,
+    } = this.state;
     let { todos } = selectedList;
+    const {
+      DEFAULT,
+      DELETE,
+      RENAME,
+      ADDEMAIL,
+      REMINDER,
+    } = this.listOptions;
 
     if (currentFilter !== 'all') {
       const todoKeys = Object.values(todos);
@@ -169,7 +257,7 @@ export default class Tasks extends React.Component {
     }
 
     return (
-      <LinearGradient style={{ flex: 1 }} colors={GlobalStyles.appBackgroundColors}>
+      <LinearGradient style={{ flex: 1 }} colors={styles.appBackgroundColors}>
         <Header
           title="Tasks"
           backgroundColor="transparent"
@@ -182,10 +270,19 @@ export default class Tasks extends React.Component {
               onPress={() => navigation.goBack()}
             />
           )}
+          iconRight={(
+            <MaterialCommunityIcons
+              style={{ position: 'absolute', right: 10 }}
+              name="arrow-down-bold-box"
+              size={20}
+              color="white"
+              onPress={() => this.showListOptions()}
+            />
+          )}
         />
-        <View style={styles.container}>
+        <View style={localStyles.container}>
           <TextInput
-            style={[styles.textInput, { color: 'white' }]}
+            style={[localStyles.textInput, { color: 'white' }]}
             autoCapitalize="sentences"
             placeholder="What needs to be done?"
             placeholderTextColor="rgba(255, 255, 255, 0.7)"
@@ -194,7 +291,7 @@ export default class Tasks extends React.Component {
             onSubmitEditing={this.addTodo}
             value={todo}
           />
-          <View style={styles.todosWrp}>
+          <View style={localStyles.todosWrp}>
             <Filter
               filterTitle="Your Todos"
               currentFilter={currentFilter}
@@ -212,6 +309,81 @@ export default class Tasks extends React.Component {
             </ScrollView>
           </View>
         </View>
+
+        {/* List Options Modal */}
+        <SimpleModal
+          title="List Options"
+          visible={showListOptions}
+          closeAction={
+            () => this.setState({
+              showListOptions: false,
+              route: this.listOptions.DEFAULT,
+            })
+          }
+        >
+          <Switch route={route}>
+            {/* DEFAULT */}
+            <Switch.Case match={DEFAULT}>
+              <View>
+                <Buttons
+                  type="link"
+                  title="Delete"
+                  onPress={() => this.setState({ route: this.listOptions.DELETE })}
+                />
+              </View>
+            </Switch.Case>
+
+            {/* DELETE */}
+            <Switch.Case match={DELETE}>
+              <View>
+                <Text>Are you sure you wanna DELETE this list: </Text>
+              </View>
+              <View>
+                <Buttons
+                  type="primary"
+                  title="Yes"
+                  onPress={this.deleteList}
+                />
+              </View>
+            </Switch.Case>
+
+            {/* RENAME */}
+            <Switch.Case match={RENAME}>
+              <View>
+                <Text>List Name</Text>
+                <TextInput
+                  placeholder="Enter a name for the list"
+                  value={selectedList.name}
+                  onSubmitEditing={this.updateList}
+                />
+              </View>
+            </Switch.Case>
+
+            {/* ADDUSER */}
+            <Switch.Case match={ADDEMAIL}>
+              <View>
+                <Text>Add Users:</Text>
+              </View>
+              <View>
+                {this.showAddedEmails()}
+              </View>
+              <View>
+                <TextInput
+                  placeholder="Add email"
+                  value={emailInput}
+                  onSubmitEditing={this.addEmailToList}
+                />
+              </View>
+            </Switch.Case>
+
+            {/* REMINDER */}
+            <Switch.Case match={REMINDER}>
+              <View>
+                <Text>Reminder:</Text>
+              </View>
+            </Switch.Case>
+          </Switch>
+        </SimpleModal>
       </LinearGradient>
     );
   }

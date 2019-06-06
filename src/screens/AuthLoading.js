@@ -9,12 +9,7 @@ import PropTypes from 'prop-types';
 import user from '../database/User';
 
 export default class AuthLoading extends React.Component {
-  constructor(props) {
-    super(props);
-    this._bootstrapAsync();
-  }
-
-  _bootstrapAsync = () => {
+  componentDidMount() {
     const { navigation } = this.props;
 
     user.app.auth().onAuthStateChanged((currentUser) => {
@@ -29,7 +24,7 @@ export default class AuthLoading extends React.Component {
     }, (error) => {
       navigation.navigate('Login', { error });
     });
-  };
+  }
 
   render() {
     return (

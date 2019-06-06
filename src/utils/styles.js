@@ -204,6 +204,11 @@ export const buttons = StyleSheet.create({
     backgroundColor: 'transparent',
     borderColor: 'transparent',
   },
+  textLink: {
+    ...styles.btnTxtDefault,
+    color: colors.blue,
+    textDecorationLine: 'underline',
+  },
   textLight: {
     ...styles.btnTxtDefault,
   },

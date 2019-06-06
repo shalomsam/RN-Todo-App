@@ -59,10 +59,10 @@
               ".validate": "newData.isNumber()"
             },
             "completedOn": {
-              ".validate": "(newData.isNumber() && newData.val() == (data.val() == null ? now : data.val()))"
+              ".validate": "newData.isNumber()"
             },
             "dueDate": {
-              ".validate": "(newData.isNumber() && newData.val() == (data.val() == null ? now : data.val()))"
+              ".validate": "newData.isNumber()"
             },
             "$other": {
               ".validate": "false"
