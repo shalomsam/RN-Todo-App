@@ -6,13 +6,13 @@ import PropTypes from 'prop-types';
 import { styles, colors } from '../../utils/styles';
 
 class Header extends React.PureComponent {
-  renderStatusbar = backgroundColor => (
+  renderStatusbar = (statusBarColor = colors.primary) => (
     <View
       style={{
-        height: styles.statusBarHeight, backgroundColor,
+        height: styles.statusBarHeight,
       }}
     >
-      <StatusBar barStyle="light-content" backgroundColor={backgroundColor} />
+      <StatusBar barStyle="light-content" backgroundColor={statusBarColor} />
     </View>
   );
 
@@ -21,14 +21,15 @@ class Header extends React.PureComponent {
       style,
       textStyle,
       title,
+      statusBarColor,
       backgroundColor,
       iconLeft,
       iconRight,
     } = this.props;
-    const statusBarColor = backgroundColor || colors.primary;
+
     const headerDefault = {
       ...styles.header,
-      backgroundColor: statusBarColor,
+      backgroundColor: backgroundColor,
     };
 
     return (

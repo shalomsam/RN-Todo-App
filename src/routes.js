@@ -70,7 +70,7 @@ export const AppStack = createBottomTabNavigator({
     activeTintColor: colors.white,
     inactiveTintColor: colors.lightGrey,
     style: {
-      height: 56,
+      height: 70,
       backgroundColor: colors.secondary,
       paddingTop: gutter,
       paddingBottom: gutter,
@@ -85,6 +85,7 @@ const Router = createSwitchNavigator({
 },
 {
   initialRouteName: 'AuthLoading',
+  unmountInactiveRoutes: true,
 });
 
 export default createAppContainer(Router);

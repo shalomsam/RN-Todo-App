@@ -7,9 +7,11 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 import user from '../database/User';
+import { YellowBox } from "react-native";
 
 export default class AuthLoading extends React.Component {
   componentDidMount() {
+    YellowBox.ignoreWarnings(['Setting a timer']);
     const { navigation } = this.props;
 
     user.app.auth().onAuthStateChanged((currentUser) => {
@@ -19,7 +21,7 @@ export default class AuthLoading extends React.Component {
           .setItem('currentUser', JSON.stringify(currentUser))
           .catch(e => console.log('AuthLoading:AsyncStorage error >>', e));
       } else {
-        navigation.navigate('Signup');
+        navigation.navigate('Login');
       }
     }, (error) => {
       navigation.navigate('Login', { error });
