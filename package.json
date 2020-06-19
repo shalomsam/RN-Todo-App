@@ -10,7 +10,7 @@
   "dependencies": {
     "expo": "^37.0.0",
     "expo-linear-gradient": "~8.1.0",
-    "firebase": "7.9.0",
+    "firebase": "^7.15.3",
     "md5": "^2.2.1",
     "prop-types": "^15.7.2",
     "react": "16.9.0",
