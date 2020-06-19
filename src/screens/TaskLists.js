@@ -5,7 +5,7 @@ import {
   AsyncStorage,
   ScrollView,
 } from 'react-native';
-import { LinearGradient } from 'expo';
+import { LinearGradient } from 'expo-linear-gradient';
 import PropTypes from 'prop-types';
 import uuid from 'uuid/v4';
 import md5 from 'md5';
@@ -222,7 +222,7 @@ export default class TaskLists extends React.Component {
           title="List"
           iconRight={(
             <FontAwesome
-              style={{ position: 'absolute', right: 10 }}
+              style={styles.headerIconRight}
               name="plus"
               size={20}
               color="white"

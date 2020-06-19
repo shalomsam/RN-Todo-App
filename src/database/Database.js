@@ -22,6 +22,8 @@ export default class Database {
       appId: process.env.FIREBASE_APP_ID,
     };
 
+    console.log("firebaseConfig >> ", {});
+
     this.app = firebase.initializeApp(firebaseConfig);
     this.database = this.app.database();
     Database.instance = this;

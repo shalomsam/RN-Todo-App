@@ -6,7 +6,7 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
-import { LinearGradient } from 'expo';
+import { LinearGradient } from 'expo-linear-gradient';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
@@ -263,7 +263,7 @@ export default class Tasks extends React.Component {
           backgroundColor="transparent"
           iconLeft={(
             <FontAwesome
-              style={{ position: 'absolute', left: 10 }}
+              style={styles.headerIconLeft}
               name="chevron-left"
               size={20}
               color="white"
@@ -272,7 +272,7 @@ export default class Tasks extends React.Component {
           )}
           iconRight={(
             <MaterialCommunityIcons
-              style={{ position: 'absolute', right: 10 }}
+              style={styles.headerIconRight}
               name="arrow-down-bold-box"
               size={20}
               color="white"

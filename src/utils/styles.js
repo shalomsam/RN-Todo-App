@@ -22,7 +22,7 @@ export const fontColorLight = colors.white;
 export const fontColorDark = colors.darkGrey;
 export const gutter = 10;
 export const borderRadius = 5;
-export const headerHeight = Platform.OS === 'ios' ? 56 : 56;
+export const headerHeight = 60;
 
 export const btnDefault = {
   position: 'relative',
@@ -51,7 +51,7 @@ export const textInputLight = {
 export const styles = {
   iconSize,
   appBackgroundColors: [colors.primary, colors.secondary],
-  statusBarHeight: Platform.OS === 'ios' ? 40 : StatusBar.currentHeight,
+  statusBarHeight: Platform.OS === 'ios' ? 20 : 0,
 
   container: {
     flex: 1,
@@ -80,6 +80,19 @@ export const styles = {
     fontWeight: '800',
     textAlign: 'center',
   },
+
+  headerIconLeft: {
+    position: 'absolute',
+    left: 10,
+    zIndex: 10,
+  },
+
+  headerIconRight: {
+    position: 'absolute',
+    right: 10,
+    zIndex: 10,
+  },
+
 
   btnTxtDefault: {
     fontSize: btnTxtSize,
