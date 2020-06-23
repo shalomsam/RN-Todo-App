@@ -4,14 +4,17 @@ import {
   StatusBar,
   View,
   AsyncStorage,
+  YellowBox,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import user from '../database/User';
-import { YellowBox } from "react-native";
+import AppSplashScreen from '../components/AppSplashScreen';
+
 
 export default class AuthLoading extends React.Component {
   componentDidMount() {
     YellowBox.ignoreWarnings(['Setting a timer']);
+
     const { navigation } = this.props;
 
     user.app.auth().onAuthStateChanged((currentUser) => {
@@ -30,10 +33,9 @@ export default class AuthLoading extends React.Component {
 
   render() {
     return (
-      <View>
-        <StatusBar barStyle="default" />
-        <ActivityIndicator />
-      </View>
+      <AppSplashScreen
+        autoProgress
+      />
     );
   }
 }
