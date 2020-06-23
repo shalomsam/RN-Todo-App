@@ -8,8 +8,11 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@expo/vector-icons": "^10.0.0",
     "expo": "^37.0.0",
+    "expo-font": "~8.1.0",
     "expo-linear-gradient": "~8.1.0",
+    "expo-splash-screen": "^0.2.3",
     "firebase": "^7.15.3",
     "md5": "^2.2.1",
     "prop-types": "^15.7.2",
