@@ -29,7 +29,7 @@ class Header extends React.PureComponent {
 
     const headerDefault = {
       ...styles.header,
-      backgroundColor: backgroundColor,
+      backgroundColor,
     };
 
     return (
@@ -62,6 +62,7 @@ Header.propTypes = {
   style: PropTypes.object,
   textStyle: PropTypes.object,
   backgroundColor: PropTypes.string,
+  statusBarColor: PropTypes.string,
   iconLeft: PropTypes.element,
   iconRight: PropTypes.element,
 };
