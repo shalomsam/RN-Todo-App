@@ -6,30 +6,11 @@ import {
   MaterialIcons,
   Ionicons,
 } from '@expo/vector-icons';
-// import { Image, View } from 'react-native';
-// import { ProgressBar } from 'react-native-paper';
 import * as SplashScreen from 'expo-splash-screen';
 import Router from './routes';
-// import { colors } from './utils/styles';
 import AppSplashScreen from './components/AppSplashScreen';
 
 const cacheFonts = (fonts = []) => fonts.map(font => Font.loadAsync(font));
-
-// const progressPromise = (promises, callback) => {
-//   const len = promises.length;
-//   let progress = 0;
-
-//   const tick = (promise) => {
-//     promise.then(() => {
-//       progress += 1;
-//       callback(progress, len);
-//     });
-
-//     return promise;
-//   };
-
-//   return Promise.all(promises.map(tick));
-// };
 
 class Main extends React.Component {
   state = {
@@ -39,21 +20,6 @@ class Main extends React.Component {
   componentDidMount() {
     SplashScreen.preventAutoHideAsync();
   }
-
-  // _loadAssetsAsync = async () => {
-  //   SplashScreen.hideAsync();
-  //   const fontAssets = cacheFonts([
-  //     FontAwesome.font,
-  //     MaterialCommunityIcons.font,
-  //     MaterialIcons.font, Ionicons.font,
-  //   ]);
-
-  //   await progressPromise([...fontAssets], (completed, total) => {
-  //     this.setState({ progress: (completed / total) * 100 });
-  //   });
-
-  //   this.setState({ isReady: true });
-  // }
 
   render() {
     const { isReady } = this.state;

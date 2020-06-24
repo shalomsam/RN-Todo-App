@@ -8,7 +8,7 @@
       "ios",
       "android"
     ],
-    "version": "1.0.0",
+    "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -24,10 +24,12 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.shalomsam.rntodo"
+      "bundleIdentifier": "com.shalomsam.rntodo",
+      "buildNumber": "0.0.1"
     },
     "android": {
-      "package": "com.shalomsam.rntodo"
+      "package": "com.shalomsam.rntodo",
+      "versionCode": 370000001
     }
   }
 }

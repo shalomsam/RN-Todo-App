@@ -1,4 +1,4 @@
-import { StyleSheet, Platform, StatusBar } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 
 export const colors = {
   white: '#ffffff',
