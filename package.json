@@ -6,7 +6,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "eject": "expo eject",
-    "bumpVersion": "npx standard-version"
+    "bumpVersion": "npx standard-version",
+    "commit": "git-cz"
   },
   "dependencies": {
     "@expo/vector-icons": "^10.0.0",
@@ -26,16 +27,31 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "@commitlint/cli": "^9.0.1",
+    "@commitlint/config-conventional": "^9.0.1",
     "babel-eslint": "^10.0.1",
     "babel-plugin-inline-dotenv": "^1.3.3",
     "babel-preset-expo": "^8.1.0",
+    "commitizen": "^4.1.2",
+    "cz-conventional-changelog": "^3.2.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-import": "^2.17.2",
     "eslint-plugin-jsx-a11y": "^6.2.1",
     "eslint-plugin-react": "^7.13.0",
+    "husky": "^4.2.5",
     "standard-version": "^7.1.0",
     "standard-version-expo": "^1.0.3"
   },
-  "private": true
+  "private": true,
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
 }
