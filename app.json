@@ -8,7 +8,7 @@
       "ios",
       "android"
     ],
-    "version": "0.0.2",
+    "version": "0.0.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -25,11 +25,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.shalomsam.organiizr",
-      "buildNumber": "0.0.2"
+      "buildNumber": "0.0.3"
     },
     "android": {
       "package": "com.shalomsam.organiizr",
-      "versionCode": 370000002
+      "versionCode": 370000003
     }
   }
 }
