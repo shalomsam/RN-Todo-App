@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "React Native Todo App",
-    "description": "This is a simple Todo app build along with a tutorial which you can find at https://techunderthesun.in/making-a-simple-todo-mobile-app-react-native/",
+    "name": "Organiizr",
+    "description": "This is an organizer/checklist app build to help you better manage and get notified of your daily tasks. This app is built using react native expo, and has a tutorial which you can find at https://techunderthesun.in/making-a-simple-todo-mobile-app-react-native/",
     "slug": "simple-todo-native",
     "privacy": "public",
     "platforms": [
@@ -24,11 +24,11 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.shalomsam.rntodo",
+      "bundleIdentifier": "com.shalomsam.organiizr",
       "buildNumber": "0.0.2"
     },
     "android": {
-      "package": "com.shalomsam.rntodo",
+      "package": "com.shalomsam.organiizr",
       "versionCode": 370000002
     }
   }
