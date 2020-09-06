@@ -6,6 +6,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "eject": "expo eject",
+    "firebase:setup": "./scripts/cli.js init",
     "bumpVersion": "npx standard-version",
     "commit": "git-cz"
   },
@@ -33,6 +34,8 @@
     "babel-eslint": "^10.0.1",
     "babel-plugin-inline-dotenv": "^1.3.3",
     "babel-preset-expo": "^8.1.0",
+    "colors": "^1.4.0",
+    "commander": "^6.1.0",
     "commitizen": "^4.1.2",
     "cz-conventional-changelog": "^3.2.0",
     "eslint": "^5.16.0",
