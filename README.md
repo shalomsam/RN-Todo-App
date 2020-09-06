@@ -2,6 +2,12 @@
 
 This app was built as part of a tutorial project, which you can find [here](https://techunderthesun.in/making-a-simple-todo-mobile-app-react-native/). This is a simple Todo App built using [React Native](https://facebook.github.io/react-native/) & [Expo CLI](https://docs.expo.io/versions/latest/workflow/expo-cli/).
 
+## Installation
+* Before you get started make sure you have an account created in [firebase](https://firebase.google.com/).
+* Then clone this repository.
+* run `npx firebase init` to initialize the repo with firebase config.
+* run `npm run firebase:setup` to create .env file.
+* Then run `npm run start` to run the app on Expo.
 
 ## Author
 #### Shalom Sam
