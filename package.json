@@ -1,6 +1,10 @@
 {
   "version": "0.0.3",
   "main": "node_modules/expo/AppEntry.js",
+  "engines": {
+    "node": ">=12.8.3",
+    "npm": ">=6.14.6"
+  },
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",

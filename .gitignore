@@ -8,3 +8,5 @@ npm-debug.*
 *.key
 *.mobileprovision
 .env
+scripts/cache.json
+*.log
