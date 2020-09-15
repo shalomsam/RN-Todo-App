@@ -1,8 +1,5 @@
 import React from 'react';
 import {
-  ActivityIndicator,
-  StatusBar,
-  View,
   AsyncStorage,
   YellowBox,
 } from 'react-native';

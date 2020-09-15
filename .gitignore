@@ -10,3 +10,5 @@ npm-debug.*
 .env
 scripts/cache.json
 *.log
+google-services.json
+GoogleService-info.plist

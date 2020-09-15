@@ -1,35 +1,37 @@
 {
-  "expo": {
-    "name": "Organiizr",
-    "description": "This is an organizer/checklist app build to help you better manage and get notified of your daily tasks. This app is built using react native expo, and has a tutorial which you can find at https://techunderthesun.in/making-a-simple-todo-mobile-app-react-native/",
-    "slug": "simple-todo-native",
-    "privacy": "public",
-    "platforms": [
-      "ios",
-      "android"
-    ],
-    "version": "0.0.3",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.shalomsam.organiizr",
-      "buildNumber": "0.0.3"
-    },
-    "android": {
-      "package": "com.shalomsam.organiizr",
-      "versionCode": 370000003
+    "expo": {
+        "name": "Organiizr",
+        "scheme": "organiizr",
+        "description": "This is an organizer/checklist app build to help you better manage and get notified of your daily tasks. This app is built using react native expo, and has a tutorial which you can find at https://techunderthesun.in/making-a-simple-todo-mobile-app-react-native/",
+        "slug": "simple-todo-native",
+        "privacy": "public",
+        "platforms": [
+            "ios",
+            "android"
+        ],
+        "version": "0.0.3",
+        "orientation": "portrait",
+        "icon": "./assets/icon.png",
+        "splash": {
+            "image": "./assets/splash.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#ffffff"
+        },
+        "updates": {
+            "fallbackToCacheTimeout": 0
+        },
+        "assetBundlePatterns": [
+            "**/*"
+        ],
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "com.shalomsam.organiizr",
+            "buildNumber": "0.0.3"
+        },
+        "android": {
+            "package": "com.shalomsam.organiizr",
+            "googleServicesFile": "./google-services.json",
+            "versionCode": 370000003
+        }
     }
-  }
 }
