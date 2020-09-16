@@ -1,44 +1,28 @@
 import React from 'react';
 import { View } from 'react-native';
-import { styles, colors, gutter } from '../../utils/styles';
-import { FontAwesome } from '@expo/vector-icons';
+import { styles, gutter } from '../../utils/styles';
 import GoogleButton from './GoogleButton';
+import FacebookButton from './FacebookButton';
+import GithubButton from './GithubButton';
 
 const SocialLogins = () => {
-    const transparentStyle = { opacity: 0.9 };
-    const iconSize = 40;
     return (
         <View
             style={[
                 styles.container,
                 {
                     flexDirection: "row",
-                    justifyContent: "space-between",
-                    // alignItems: "center",
+                    justifyContent: "space-evenly",
                     padding: gutter,
                     margin: gutter,
                 }
             ]}
         >
-            <View>
-                <FontAwesome
-                    style={transparentStyle}
-                    name="facebook"
-                    size={iconSize}
-                    color={colors.white}
-                />
-            </View>
+            <FacebookButton />
             <GoogleButton />
-            <View>
-                <FontAwesome
-                    style={transparentStyle}
-                    name="twitter"
-                    size={iconSize}
-                    color={colors.white}
-                />
-            </View>
+            <GithubButton />
         </View>
-    )
+    );
 }
 
 export default SocialLogins;

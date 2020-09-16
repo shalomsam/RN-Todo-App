@@ -9,6 +9,8 @@ This app was built as part of a tutorial project, which you can find [here](http
 * run `npm run firebase:setup` to create .env file.
 * Then run `npm run start` to run the app on Expo.
 * Download Googleservices-info.plist & google-services.json
+* Add FB AppId and Secret to .env
+* Add Github Client Id and Secret to .env
 
 ## Author
 #### Shalom Sam

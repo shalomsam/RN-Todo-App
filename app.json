@@ -9,6 +9,7 @@
             "ios",
             "android"
         ],
+        "facebookScheme": "fb320848255809205",
         "version": "0.0.3",
         "orientation": "portrait",
         "icon": "./assets/icon.png",
