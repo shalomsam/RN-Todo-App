@@ -4,27 +4,30 @@ import PropTypes from 'prop-types';
 import Case from './Case';
 
 export default class Switch extends PureComponent {
-  static Case = props => <Case {...props} />;
+    // eslint-disable-next-line react/jsx-props-no-spreading
+    static Case = (props) => <Case {...props} />;
 
-  state = {};
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
 
-  render() {
-    const { children, route } = this.props;
-    return (
-      <View>
-        {React.Children.map(children, (el) => {
-          if (el.props.match === route) {
-            return React.cloneElement(el);
-          }
-
-          return null;
-        })}
-      </View>
-    );
-  }
+    render() {
+        const { children, route } = this.props;
+        return (
+            <View>
+                {React.Children.map(children, (el) => {
+                    if (el.props.match === route) {
+                        return React.cloneElement(el);
+                    }
+                    return null;
+                })}
+            </View>
+        );
+    }
 }
 
 Switch.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.array, PropTypes.object]).isRequired,
-  route: PropTypes.string.isRequired,
+    children: PropTypes.oneOfType([PropTypes.array, PropTypes.object]).isRequired,
+    route: PropTypes.string.isRequired,
 };

@@ -9,7 +9,6 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import Signup from './screens/Signup';
 import Login from './screens/Login';
-import Header from './components/UI/Header';
 import TaskLists from './screens/TaskLists';
 import Tasks from './screens/Tasks';
 import Profile from './screens/Profile';
@@ -39,10 +38,10 @@ export const ListsStack = createStackNavigator({
         screen: Tasks,
     },
 },
-    {
-        headerMode: 'none',
-        initialRouteName: 'TaskLists',
-    });
+{
+    headerMode: 'none',
+    initialRouteName: 'TaskLists',
+});
 
 export const AppStack = createBottomTabNavigator({
     Lists: {
@@ -83,9 +82,9 @@ const Router = createSwitchNavigator({
     Auth: AuthStack,
     App: AppStack,
 },
-    {
-        initialRouteName: 'AuthLoading',
-        unmountInactiveRoutes: true,
-    });
+{
+    initialRouteName: 'AuthLoading',
+    unmountInactiveRoutes: true,
+});
 
 export default createAppContainer(Router);

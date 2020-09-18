@@ -93,7 +93,6 @@ export const styles = {
         zIndex: 10,
     },
 
-
     btnTxtDefault: {
         fontSize: btnTxtSize,
         color: fontColorLight,

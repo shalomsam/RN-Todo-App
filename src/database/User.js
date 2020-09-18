@@ -1,4 +1,4 @@
-/* eslint-disable class-methods-use-this */
+import firebase from 'firebase';
 import Database from './Database';
 
 class User extends Database {
@@ -47,16 +47,17 @@ class User extends Database {
         }
     }
 
+    // eslint-disable-next-line camelcase
     googleSignIn = (id_token) => {
         const creds = firebase.auth.GoogleAuthProvider.credential(id_token);
         this.app.auth().signInWithCredential(creds);
     }
 
-    _success = obj => (
+    _success = (obj) => (
         obj ? { status: 'success', ...obj } : { status: 'success' }
     );
 
-    _error = err => (
+    _error = (err) => (
         { status: 'error', ...err }
     );
 }

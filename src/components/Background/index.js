@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import PropTypes from 'prop-types';
-import Unsplash from 'unsplash-js';
 
 const Background = ({
     bgColors,
-    style,
-    children
+    style = {},
+    children,
 }) => {
-    const isGradient = typeof bgColors !== "string";
+    const isGradient = typeof bgColors !== 'string';
     const BgComponent = isGradient ? LinearGradient : View;
-    
+
     return (
         <BgComponent
             style={style}
@@ -19,11 +18,13 @@ const Background = ({
         >
             {children}
         </BgComponent>
-    )
-}
+    );
+};
 
 Background.propTypes = {
-    bgColor: PropTypes.oneOf([PropTypes.array, PropTypes.string])
-}
+    bgColors: PropTypes.oneOf([PropTypes.array, PropTypes.string]).isRequired,
+    style: PropTypes.object,
+    children: PropTypes.any,
+};
 
 export default Background;

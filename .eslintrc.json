@@ -20,7 +20,6 @@
         "ecmaVersion": 2018,
         "sourceType": "module"
     },
-    
     "rules": {
         "react/jsx-filename-extension": [
             2,
@@ -31,6 +30,14 @@
         "react/forbid-prop-types": [0],
         "react/require-default-props": [0],
         "global-require": [0],
-        "no-underscore-dangle": [0]
-    }
+        "no-underscore-dangle": [0],
+        "indent": ["error", 4],
+        "react/jsx-indent": ["error", 4],
+        "react/jsx-indent-props": ["error", 4]
+    },
+    "overrides": [
+        {
+            "files": [ "src/**/*.js" ]
+        }
+    ]
 }

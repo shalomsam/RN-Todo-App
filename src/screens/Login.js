@@ -20,8 +20,8 @@ const InputStyle = {
     backgroundColor: colors.white,
     opacity: 0.8,
     borderColor: colors.white,
-    color: colors.darkGrey
-}
+    color: colors.darkGrey,
+};
 
 export default class Login extends React.Component {
     constructor(props) {
@@ -66,8 +66,7 @@ export default class Login extends React.Component {
                 >
                     {btnLoading
                         ? <ActivityIndicator size="small" color={colors.darkGrey} />
-                        : <Text style={buttons.textLight}>Login</Text>
-                    }
+                        : <Text style={buttons.textLight}>Login</Text>}
                 </TouchableHighlight>
                 <TouchableOpacity
                     style={buttons.link}
@@ -79,9 +78,10 @@ export default class Login extends React.Component {
                             color: colors.white,
                             fontWeight: 'bold',
                             fontSize: 16,
-                            textAlign: 'center'
-                        }
-                    ]}>
+                            textAlign: 'center',
+                        },
+                    ]}
+                    >
                         Don&apos;t have an account? Signup Here.
                     </Text>
                 </TouchableOpacity>
@@ -109,11 +109,10 @@ export default class Login extends React.Component {
             passErr,
         } = this.state;
 
-
         return (
             <UnSplashBg
                 defaultColor={colors.blue}
-                forceNewBackground={true}
+                forceNewBackground
             >
                 <Container
                     containerStyles={{ justifyContent: 'center' }}
@@ -122,23 +121,25 @@ export default class Login extends React.Component {
                         style={{
                             fontSize: 70,
                             color: colors.white,
-                            textShadowColor: "#000",
+                            textShadowColor: '#000',
                             textShadowOffset: { height: 0, width: 0 },
-                            textShadowRadius: 5
+                            textShadowRadius: 5,
                         }}
                     >
-                        Hi{"\n"}There.
+                        Hi
+                        {'\n'}
+                        There.
                     </Text>
                     <TextInput
                         placeholder="Email"
                         autoCapitalize="none"
                         placeholderTextColor={colors.darkGrey}
                         style={
-                            emailErr ?
-                                textInputs.error :
-                                [
+                            emailErr
+                                ? textInputs.error
+                                : [
                                     textInputs.default,
-                                    InputStyle
+                                    InputStyle,
                                 ]
                         }
                         onChange={({ nativeEvent }) => this.setState({ email: nativeEvent.text })}
@@ -150,14 +151,16 @@ export default class Login extends React.Component {
                         autoCapitalize="none"
                         placeholderTextColor={colors.darkGrey}
                         style={
-                            passErr ?
-                                textInputs.error :
-                                [
+                            passErr
+                                ? textInputs.error
+                                : [
                                     textInputs.default,
-                                    InputStyle
+                                    InputStyle,
                                 ]
                         }
-                        onChange={({ nativeEvent }) => this.setState({ password: nativeEvent.text })}
+                        onChange={({ nativeEvent }) => {
+                            this.setState({ password: nativeEvent.text });
+                        }}
                         value={password}
                     />
                     {this.renderButton()}
@@ -165,7 +168,7 @@ export default class Login extends React.Component {
                     {this.renderErrorMsg()}
                 </Container>
             </UnSplashBg>
-        )
+        );
     }
 }
 

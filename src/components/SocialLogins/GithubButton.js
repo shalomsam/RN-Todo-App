@@ -3,6 +3,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
 import { FontAwesome } from '@expo/vector-icons';
 import { View } from 'react-native';
+import firebase from 'firebase';
 import appConfig from '../../../app.json';
 import { colors } from '../../utils/styles';
 
@@ -19,17 +20,16 @@ const transparentStyle = { opacity: 0.9 };
 const iconSize = 40;
 
 const GithubButton = () => {
-
     const [request, response, promptAsync] = useAuthRequest(
         {
             clientId: process.env.GITHUB_CLIENT_ID,
             scopes: ['identity'],
             redirectUri: makeRedirectUri({
-                native: `${appConfig.expo.scheme}://`
-            })
+                native: `${appConfig.expo.scheme}://`,
+            }),
         },
-        discovery
-    )
+        discovery,
+    );
 
     React.useEffect(() => {
         if (response?.type === 'success') {
@@ -52,11 +52,11 @@ const GithubButton = () => {
                 size={iconSize}
                 color={colors.white}
                 onPress={() => {
-                    promptAsync()
+                    promptAsync();
                 }}
             />
         </View>
-    )
-}
+    );
+};
 
 export default GithubButton;

@@ -2,7 +2,7 @@ class LogManager {
   loggerObj;
 
   constructor(loggerObj) {
-    this.loggerObj = loggerObj || console;
+      this.loggerObj = loggerObj || console;
   }
 }
 
