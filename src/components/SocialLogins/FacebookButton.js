@@ -15,7 +15,6 @@ const iconSize = 40;
 const FacebookButton = () => {
     const [request, response, promptAsync] = Facebook.useAuthRequest({
         clientId: process.env.FB_APP_ID,
-        clientSecret: process.env.FB_APP_SECRET,
         responseType: ResponseType.Token,
     });
 
@@ -26,6 +25,9 @@ const FacebookButton = () => {
 
             const credential = firebase.auth.FacebookAuthProvider.credential(access_token);
             firebase.auth().signInWithCredential(credential);
+        }
+        if (response?.error || response?.errorCode) {
+            throw new Error(response?.error || response?.errorCode);
         }
     }, [response]);
 
@@ -41,7 +43,11 @@ const FacebookButton = () => {
                 size={iconSize}
                 color={colors.white}
                 onPress={() => {
-                    promptAsync();
+                    try {
+                        promptAsync();
+                    } catch (e) {
+                        throw new Error(e.message);
+                    }
                 }}
             />
         </View>

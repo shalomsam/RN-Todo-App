@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     AsyncStorage, View, Text, ImageBackground,
 } from 'react-native';
@@ -19,11 +19,18 @@ const UnSplashBg = ({
 
     const [bgImage, setBgImage] = useState(null);
     const todayTimestamp = (new Date()).getTime();
+    const mountedRef = useRef(true);
+
+    const safeSetBgImage = (data) => {
+        if (mountedRef.current) {
+            setBgImage(data);
+        }
+    };
 
     useEffect(() => {
         const setRandomImg = (imageArr) => {
             const randomIndex = Math.round(Math.random() * totalImages);
-            setBgImage(imageArr[randomIndex]);
+            safeSetBgImage(imageArr[randomIndex]);
         };
 
         const getUnsplashImage = async () => {
@@ -47,7 +54,7 @@ const UnSplashBg = ({
                 .then((data) => {
                     const shouldRenew = (todayTimestamp > data?.renewDate) && !forceNewBackground;
                     if (data && data.images.length && !shouldRenew) {
-                        setRandomImg(data.images);
+                        safeSetBgImage(data.images);
                         return;
                     }
 
@@ -77,6 +84,10 @@ const UnSplashBg = ({
                         .catch((e) => console.error('getUnsplashImage >> err >> ', e));
                 });
         }
+
+        return () => {
+            mountedRef.current = false;
+        };
     });
 
     const userLink = `${bgImage?.user?.links?.html || ''}?utm_source=Organiizr&utm_medium=referral`;

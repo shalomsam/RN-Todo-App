@@ -15,6 +15,8 @@ import user from '../database/User';
 import UnSplashBg from '../components/UnSplashBg';
 import Container from '../components/Container';
 import SocialLogins from '../components/SocialLogins';
+import ErrorHandler from '../components/ErrorHandler';
+import Divider from '../components/Divider';
 
 const InputStyle = {
     backgroundColor: colors.white,
@@ -61,7 +63,7 @@ export default class Login extends React.Component {
         return (
             <View>
                 <TouchableHighlight
-                    style={[btnLoading ? buttons.default : buttons.primary, { marginTop: 120 }]}
+                    style={[btnLoading ? buttons.default : buttons.primary]}
                     onPress={this.login}
                 >
                     {btnLoading
@@ -72,15 +74,16 @@ export default class Login extends React.Component {
                     style={buttons.link}
                     onPress={this.gotoSignup}
                 >
-                    <Text style={[
-                        styles.linkTxt,
-                        {
-                            color: colors.white,
-                            fontWeight: 'bold',
-                            fontSize: 16,
-                            textAlign: 'center',
-                        },
-                    ]}
+                    <Text
+                        style={[
+                            styles.linkTxt,
+                            {
+                                color: colors.white,
+                                fontWeight: 'bold',
+                                fontSize: 16,
+                                textAlign: 'center',
+                            },
+                        ]}
                     >
                         Don&apos;t have an account? Signup Here.
                     </Text>
@@ -114,59 +117,64 @@ export default class Login extends React.Component {
                 defaultColor={colors.blue}
                 forceNewBackground
             >
-                <Container
-                    containerStyles={{ justifyContent: 'center' }}
-                >
-                    <Text
-                        style={{
-                            fontSize: 70,
-                            color: colors.white,
-                            textShadowColor: '#000',
-                            textShadowOffset: { height: 0, width: 0 },
-                            textShadowRadius: 5,
-                        }}
+                <ErrorHandler>
+                    <Container
+                        containerStyles={{ justifyContent: 'center' }}
                     >
-                        Hi
-                        {'\n'}
-                        There.
-                    </Text>
-                    <TextInput
-                        placeholder="Email"
-                        autoCapitalize="none"
-                        placeholderTextColor={colors.darkGrey}
-                        style={
-                            emailErr
-                                ? textInputs.error
-                                : [
-                                    textInputs.default,
-                                    InputStyle,
-                                ]
-                        }
-                        onChange={({ nativeEvent }) => this.setState({ email: nativeEvent.text })}
-                        value={email}
-                    />
-                    <TextInput
-                        secureTextEntry
-                        placeholder="Password"
-                        autoCapitalize="none"
-                        placeholderTextColor={colors.darkGrey}
-                        style={
-                            passErr
-                                ? textInputs.error
-                                : [
-                                    textInputs.default,
-                                    InputStyle,
-                                ]
-                        }
-                        onChange={({ nativeEvent }) => {
-                            this.setState({ password: nativeEvent.text });
-                        }}
-                        value={password}
-                    />
-                    {this.renderButton()}
-                    <SocialLogins />
-                    {this.renderErrorMsg()}
-                </Container>
+                        <Text
+                            style={{
+                                fontSize: 70,
+                                color: colors.white,
+                                textShadowColor: '#000',
+                                textShadowOffset: { height: 0, width: 0 },
+                                textShadowRadius: 5,
+                            }}
+                        >
+                            Hi
+                            {'\n'}
+                            There.
+                        </Text>
+                        <TextInput
+                            placeholder="Email"
+                            autoCapitalize="none"
+                            placeholderTextColor={colors.darkGrey}
+                            style={
+                                emailErr
+                                    ? textInputs.error
+                                    : [
+                                        textInputs.default,
+                                        InputStyle,
+                                    ]
+                            }
+                            onChange={({ nativeEvent }) => {
+                                this.setState({ email: nativeEvent.text });
+                            }}
+                            value={email}
+                        />
+                        <TextInput
+                            secureTextEntry
+                            placeholder="Password"
+                            autoCapitalize="none"
+                            placeholderTextColor={colors.darkGrey}
+                            style={
+                                passErr
+                                    ? textInputs.error
+                                    : [
+                                        textInputs.default,
+                                        InputStyle,
+                                    ]
+                            }
+                            onChange={({ nativeEvent }) => {
+                                this.setState({ password: nativeEvent.text });
+                            }}
+                            value={password}
+                        />
+                        {this.renderButton()}
+                        <Divider>OR</Divider>
+                        <SocialLogins />
+                        {this.renderErrorMsg()}
+                    </Container>
+                </ErrorHandler>
             </UnSplashBg>
         );
     }
