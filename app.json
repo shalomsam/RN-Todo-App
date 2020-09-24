@@ -10,7 +10,7 @@
             "android"
         ],
         "facebookScheme": "fb320848255809205",
-        "version": "0.0.3",
+        "version": "0.0.4",
         "orientation": "portrait",
         "icon": "./assets/icon.png",
         "splash": {
@@ -27,12 +27,12 @@
         "ios": {
             "supportsTablet": true,
             "bundleIdentifier": "com.shalomsam.organiizr",
-            "buildNumber": "0.0.3"
+            "buildNumber": "0.0.4"
         },
         "android": {
             "package": "com.shalomsam.organiizr",
             "googleServicesFile": "./google-services.json",
-            "versionCode": 370000003
+            "versionCode": 380000004
         }
     }
 }
