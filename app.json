@@ -1,7 +1,7 @@
 {
     "expo": {
         "name": "Organiizr",
-        "scheme": "organiizr",
+        "scheme": "com.shalomsam.organiizr",
         "description": "This is an organizer/checklist app build to help you better manage and get notified of your daily tasks. This app is built using react native expo, and has a tutorial which you can find at https://techunderthesun.in/making-a-simple-todo-mobile-app-react-native/",
         "slug": "simple-todo-native",
         "privacy": "public",
@@ -27,12 +27,25 @@
         "ios": {
             "supportsTablet": true,
             "bundleIdentifier": "com.shalomsam.organiizr",
-            "buildNumber": "0.0.4"
+            "buildNumber": "0.0.4",
+            "config": {
+                "googleSignIn": {
+                    "reservedClientId": "com.googleusercontent.apps.672467341657-gk7mg9m0b2t80ult8asun7h6ekevue92"
+                }
+            },
+            "googleServicesFile": "./GoogleService-Info.plist"
         },
         "android": {
             "package": "com.shalomsam.organiizr",
             "googleServicesFile": "./google-services.json",
             "versionCode": 380000004
+        },
+        "hooks": {
+            "postPublish": [
+                {
+                    "file": "sentry-expo/upload-sourcemaps"
+                }
+            ]
         }
     }
 }

@@ -6,6 +6,7 @@ import {
 import PropTypes from 'prop-types';
 import user from '../database/User';
 import AppSplashScreen from '../components/AppSplashScreen';
+import { logger } from '../utils/LogManager';
 
 export default class AuthLoading extends React.Component {
     componentDidMount() {
@@ -13,17 +14,24 @@ export default class AuthLoading extends React.Component {
 
         const { navigation } = this.props;
 
-        user.app.auth().onAuthStateChanged((currentUser) => {
+        const unsubscirbe = user.app.auth().onAuthStateChanged((currentUser) => {
             if (currentUser) {
-                navigation.navigate('App');
+                navigation.navigate('App', { screen: 'TaskLists', params: { currentUser } });
                 AsyncStorage
                     .setItem('currentUser', JSON.stringify(currentUser))
-                    .catch((e) => console.log('AuthLoading:AsyncStorage error >>', e));
+                    .catch((e) => logger.error('AuthLoading:AsyncStorage error >>', e));
             } else {
                 navigation.navigate('Login');
             }
+            if (unsubscirbe) {
+                unsubscirbe();
+            }
         }, (error) => {
+            logger.error('AuthLoading:onAuthStateChanged >> ', error);
             navigation.navigate('Login', { error });
+            if (unsubscirbe) {
+                unsubscirbe();
+            }
         });
     }
 

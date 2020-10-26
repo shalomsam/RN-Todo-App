@@ -2,7 +2,6 @@ import React from 'react';
 import {
     View,
     Text,
-    AsyncStorage,
     ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -18,6 +17,8 @@ import ListsDb from '../database/Lists';
 import Header from '../components/UI/Header';
 import Buttons from '../components/UI/Buttons';
 import SimpleModal from '../components/Modals/SimpleModal';
+import userDb from '../database/User';
+import { logger } from '../utils/LogManager';
 
 export default class TaskLists extends React.Component {
     constructor(props) {
@@ -44,237 +45,233 @@ export default class TaskLists extends React.Component {
         };
     }
 
-    componentDidMount() {
-        AsyncStorage.getItem('currentUser')
-            .then((data) => {
-                const currentUser = JSON.parse(data);
-                const { listItem } = this.state;
-                const { userEmails } = listItem;
-                listItem.owner = currentUser.email;
-                // listItem.userEmails.push(currentUser.email);
-                const emailKey = md5(currentUser.email);
+    async componentDidMount() {
+        let { list } = this.state;
+        const currentUser = await userDb.getAuthLocal();
+        const { listItem } = this.state;
+        const { userEmails } = listItem;
 
-                userEmails[emailKey] = this.addUnverifiedUserToList(emailKey, currentUser.email);
+        try {
+            listItem.owner = currentUser.email;
+            const emailKey = md5(currentUser.email);
+            userEmails[emailKey] = this.addUnverifiedUserToList(emailKey, currentUser.email);
+            this.setState({ listItem, currentUser });
 
-                this.setState({ listItem, currentUser });
+            list = await ListsDb.getTodoList(currentUser.uid);
+            this.setState({
+                loading: false,
+                list,
+            });
+        } catch (e) {
+            logger.debug('Error getting user in task >>', e);
+            throw new Error(e);
+        }
+    }
 
-                ListsDb.getTodoList(currentUser.uid).then((list) => {
-                    this.setState({
-                        list,
-                        loading: false,
-                    });
-                }).catch((e) => {
-                    console.log('TaskList CDM error >>', e);
-                });
-            })
-            .catch((e) => {
-                console.log('Error getting user in TaskList >>', e);
+    onPressAction = (item) => {
+        const { navigation } = this.props;
+        const { currentUser } = this.state;
+        navigation.navigate('Todos', { currentUser, selectedList: item, deleteListAction: this.deleteList });
+    }
+
+    deleteList = (listId) => {
+        const { currentUser, list } = this.state;
+        ListsDb.deleteTodoList(listId, currentUser.uid)
+            .then(() => {
+                delete list[listId];
+                this.setState(list);
             });
     }
 
-  onPressAction = (item) => {
-      const { navigation } = this.props;
-      const { currentUser } = this.state;
-      navigation.navigate('Todos', { currentUser, selectedList: item, deleteListAction: this.deleteList });
-  }
+    showAddNewList = () => {
+        this.setState({ showAddNewListModal: true });
+    }
 
-  deleteList = (listId) => {
-      const { currentUser, list } = this.state;
-      ListsDb.deleteTodoList(listId, currentUser.uid)
-          .then(() => {
-              delete list[listId];
-              this.setState(list);
-          });
-  }
+    renderAddListButton = () => (
+        <View>
+            <Text style={{ color: colors.white }}>No Lists Found!</Text>
+            <Buttons
+                type="tertiary"
+                title="Add New Todo List"
+                onPress={this.showAddNewList}
+            />
+        </View>
+    )
 
-  showAddNewList = () => {
-      this.setState({ showAddNewListModal: true });
-  }
+    showAddedEmails = () => {
+        const { listItem } = this.state;
+        const { userEmails } = listItem;
+        const emailKeys = Object.keys(userEmails);
 
-  renderAddListButton = () => (
-      <View>
-          <Text style={{ color: colors.white }}>No Lists Found!</Text>
-          <Buttons
-              type="tertiary"
-              title="Add New Todo List"
-              onPress={this.showAddNewList}
-          />
-      </View>
-  )
+        return emailKeys.map((emailKey) => {
+            let owner = null;
+            const listUser = userEmails[emailKey];
 
-  showAddedEmails = () => {
-      const { listItem } = this.state;
-      const { userEmails } = listItem;
-      const emailKeys = Object.keys(userEmails);
+            if (listUser.email === listItem.owner) {
+                owner = <Text>Owner</Text>;
+            }
+            return (
+                <View key={emailKey}>
+                    <Text>
+                        {listUser.email}
+                        {owner}
+                    </Text>
+                </View>
+            );
+        });
+    }
 
-      return emailKeys.map((emailKey) => {
-          let owner = null;
-          const listUser = userEmails[emailKey];
+    addEmailToList = () => {
+        const { listItem } = this.state;
+        const { userEmails } = listItem;
+        let { email } = this.state;
+        const emailKey = md5(email);
 
-          if (listUser.email === listItem.owner) {
-              owner = <Text>Owner</Text>;
-          }
-          return (
-              <View key={emailKey}>
-                  <Text>
-                      {listUser.email}
-                      {owner}
-                  </Text>
-              </View>
-          );
-      });
-  }
+        // TODO: refactor ?
+        userEmails[emailKey] = this.addUnverifiedUserToList(emailKey, email);
+        listItem.userEmails = userEmails;
+        ListsDb.updateTodoList(listItem);
+        email = '';
+        this.setState({ listItem, email });
+    }
 
-  addEmailToList = () => {
-      const { listItem } = this.state;
-      const { userEmails } = listItem;
-      let { email } = this.state;
-      const emailKey = md5(email);
+    addUnverifiedUserToList = (key, email, isSignedUp = false, deepLink = '') => ({
+        key,
+        email,
+        isSignedUp,
+        deepLink,
+    })
 
-      userEmails[emailKey] = this.addUnverifiedUserToList(emailKey, email);
-      listItem.userEmails = userEmails;
-      ListsDb.updateTodoList(listItem);
-      email = '';
-      this.setState({ listItem, email });
-  }
+    createAndAddList = async () => {
+        this.setState({ createBtnLoading: true });
 
-  addUnverifiedUserToList = (key, email, isSignedUp = false, deepLink = '') => ({
-      key,
-      email,
-      isSignedUp,
-      deepLink,
-  })
+        const { listItem, currentUser } = this.state;
+        let { list } = this.state;
 
-  createAndAddList = async () => {
-      this.setState({ createBtnLoading: true });
+        listItem.key = uuid();
+        list = list || {};
+        list[listItem.key] = listItem;
 
-      const { listItem, currentUser } = this.state;
-      let { list } = this.state;
+        try {
+            await ListsDb.addTodoList(listItem, currentUser.uid, listItem.key);
+            this.setState({
+                email: '',
+                list,
+                createBtnLoading: false,
+                listItem: {
+                    ...this.listDefault,
+                    name: null,
+                },
+                showAddNewListModal: false,
+            });
+        } catch (e) {
+            logger.error('TaskLists:createAndAddList >>', e);
+        }
+    }
 
-      listItem.key = uuid();
-      list = list || {};
-      list[listItem.key] = listItem;
+    render() {
+        const {
+            list,
+            listItem,
+            showAddNewListModal,
+            listNameErr,
+            emailErr,
+            email,
+            createBtnLoading,
+            loading,
+        } = this.state;
 
-      try {
-          await ListsDb.addTodoList(listItem, currentUser.uid, listItem.key);
-          this.setState({
-              email: '',
-              list,
-              createBtnLoading: false,
-              listItem: {
-                  ...this.listDefault,
-                  name: null,
-              },
-              showAddNewListModal: false,
-          });
-      } catch (e) {
-          console.log(e);
-      }
-  }
+        let listLen = 0;
+        let content = null;
 
-  render() {
-      const {
-          list,
-          listItem,
-          showAddNewListModal,
-          listNameErr,
-          emailErr,
-          email,
-          createBtnLoading,
-          loading,
-      } = this.state;
+        if (list !== null) {
+            const keys = Object.keys(list);
+            listLen = keys.length;
+        }
 
-      let listLen = 0;
-      let content = null;
+        if (loading) {
+            content = (
+                <View
+                    style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    <ActivityIndicator size={30} color="white" />
+                </View>
+            );
+        } else if (listLen === 0) {
+            content = this.renderAddListButton();
+        } else {
+            content = <List items={list} onPressAction={this.onPressAction} />;
+        }
 
-      if (list !== null) {
-          const keys = Object.keys(list);
-          listLen = keys.length;
-      }
+        const nameInputStyle = listNameErr ? textInputs.error : textInputs.default;
+        const userInputStyle = emailErr ? textInputs.error : textInputs.default;
 
-      if (loading) {
-          content = (
-              <View
-                  style={{
-                      flex: 1,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                  }}
-              >
-                  <ActivityIndicator size={30} color="white" />
-              </View>
-          );
-      } else if (listLen === 0) {
-          content = this.renderAddListButton();
-      } else {
-          content = <List items={list} onPressAction={this.onPressAction} />;
-      }
+        return (
+            <LinearGradient
+                style={{ flex: 1 }}
+                colors={styles.appBackgroundColors}
+            >
+                <Header
+                    title="List"
+                    iconRight={(
+                        <FontAwesome
+                            style={styles.headerIconRight}
+                            name="plus"
+                            size={20}
+                            color="white"
+                            onPress={this.showAddNewList}
+                        />
+                    )}
+                    backgroundColor="transparent"
+                />
+                <View style={[styles.container, { justifyContent: 'flex-start' }]}>
+                    <ScrollView>
+                        {content}
+                    </ScrollView>
+                </View>
 
-      const nameInputStyle = listNameErr ? textInputs.error : textInputs.default;
-      const userInputStyle = emailErr ? textInputs.error : textInputs.default;
-
-      return (
-          <LinearGradient
-              style={{ flex: 1 }}
-              colors={styles.appBackgroundColors}
-          >
-              <Header
-                  title="List"
-                  iconRight={(
-                      <FontAwesome
-                          style={styles.headerIconRight}
-                          name="plus"
-                          size={20}
-                          color="white"
-                          onPress={this.showAddNewList}
-                      />
-                  )}
-                  backgroundColor="transparent"
-              />
-              <View style={[styles.container, { justifyContent: 'flex-start' }]}>
-                  <ScrollView>
-                      { content }
-                  </ScrollView>
-              </View>
-
-              {/* Modal */}
-              <SimpleModal
-                  title="Add new list:"
-                  visible={showAddNewListModal}
-                  closeAction={() => this.setState({ showAddNewListModal: false })}
-              >
-                  <TextInput
-                      placeholder="List Name"
-                      autoCapitalize="none"
-                      style={nameInputStyle}
-                      onChange={({ nativeEvent }) => {
-                          listItem.name = nativeEvent.text;
-                          this.setState({ listItem });
-                      }}
-                      value={listItem.name}
-                  />
-                  <Text>Add users:</Text>
-                  {this.showAddedEmails()}
-                  <TextInput
-                      placeholder="email"
-                      autoCapitalize="none"
-                      style={userInputStyle}
-                      onChange={({ nativeEvent }) => {
-                          this.setState({ email: nativeEvent.text });
-                      }}
-                      value={email}
-                      onSubmitEditing={this.addEmailToList}
-                  />
-                  <Buttons
-                      type="primary"
-                      title="Add List"
-                      onPress={this.createAndAddList}
-                      isLoading={createBtnLoading}
-                  />
-              </SimpleModal>
-          </LinearGradient>
-      );
-  }
+                {/* Modal */}
+                <SimpleModal
+                    title="Add new list:"
+                    visible={showAddNewListModal}
+                    closeAction={() => this.setState({ showAddNewListModal: false })}
+                >
+                    <TextInput
+                        placeholder="List Name"
+                        autoCapitalize="none"
+                        style={nameInputStyle}
+                        onChange={({ nativeEvent }) => {
+                            listItem.name = nativeEvent.text;
+                            this.setState({ listItem });
+                        }}
+                        value={listItem.name}
+                    />
+                    <Text>Add users:</Text>
+                    {this.showAddedEmails()}
+                    <TextInput
+                        placeholder="email"
+                        autoCapitalize="none"
+                        style={userInputStyle}
+                        onChange={({ nativeEvent }) => {
+                            this.setState({ email: nativeEvent.text });
+                        }}
+                        value={email}
+                        onSubmitEditing={this.addEmailToList}
+                    />
+                    <Buttons
+                        type="primary"
+                        title="Add List"
+                        onPress={this.createAndAddList}
+                        isLoading={createBtnLoading}
+                    />
+                </SimpleModal>
+            </LinearGradient>
+        );
+    }
 }
 
 TaskLists.propTypes = {

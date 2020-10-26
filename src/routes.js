@@ -50,7 +50,7 @@ export const AppStack = createBottomTabNavigator({
             tabBarLabel: 'Lists',
             // eslint-disable-next-line react/prop-types
             tabBarIcon: ({ tintColor }) => (
-                <FontAwesome name="th-list" size={30} color={tintColor} />
+                <FontAwesome name="th-list" size={28} color={tintColor} />
             ),
         },
     },
@@ -60,7 +60,7 @@ export const AppStack = createBottomTabNavigator({
             tabBarLabel: 'User',
             // eslint-disable-next-line react/prop-types
             tabBarIcon: ({ tintColor }) => (
-                <FontAwesome name="user-circle" size={30} color={tintColor} />
+                <FontAwesome name="user-circle" size={28} color={tintColor} />
             ),
         },
     },
@@ -69,10 +69,10 @@ export const AppStack = createBottomTabNavigator({
         activeTintColor: colors.white,
         inactiveTintColor: colors.lightGrey,
         style: {
-            height: 70,
+            height: 80,
             backgroundColor: colors.secondary,
-            paddingTop: gutter,
-            paddingBottom: gutter,
+            paddingTop: gutter - 5,
+            paddingBottom: gutter - 5,
         },
     },
 });

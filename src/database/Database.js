@@ -22,6 +22,7 @@ export default class Database {
             appId: process.env.FIREBASE_APPID,
         };
 
+        // eslint-disable-next-line no-console
         console.log('firebaseConfig >> ', {});
 
         this.app = firebase.initializeApp(firebaseConfig);

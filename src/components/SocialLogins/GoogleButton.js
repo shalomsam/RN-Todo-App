@@ -1,34 +1,39 @@
 import React from 'react';
 import * as WebBrowser from 'expo-web-browser';
-import * as Google from 'expo-auth-session/providers/google';
+// import * as Google from 'expo-auth-session/providers/google';
 import { FontAwesome } from '@expo/vector-icons';
 import { View } from 'react-native';
-import firebase from 'firebase';
+import PropTypes from 'prop-types';
+import * as GoogleSignIn from 'expo-google-sign-in';
 import { colors } from '../../utils/styles';
+import userDb from '../../database/User';
+// import appConfig from '../../../app.json';
+import { logger } from '../../utils/LogManager';
 
 WebBrowser.maybeCompleteAuthSession();
 
 const transparentStyle = { opacity: 0.9 };
 const iconSize = 40;
 
-const GoogleButton = () => {
-    const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
-        clientId: process.env.WEB_CLIENT_ID,
+const GoogleButton = ({ callback }) => {
+    React.useEffect(async () => {
+        await GoogleSignIn.initAsync();
     });
 
-    React.useEffect(() => {
-        if (response?.type === 'success') {
-            // eslint-disable-next-line camelcase
-            const { id_token } = response.params;
-
-            const credential = firebase.auth.GoogleAuthProvider.credential(id_token);
-            firebase.auth().signInWithCredential(credential);
+    const promptAsync = async () => {
+        try {
+            await GoogleSignIn.askForPlayServicesAsync();
+            const siginAsyncResult = await GoogleSignIn.signInAsync();
+            logger.info('GoogleButton:signInAsync:result >> ', siginAsyncResult);
+            const { type, user } = siginAsyncResult;
+            if (type === 'success') {
+                const res = await userDb.socialSignIn('google', user.auth.idToken);
+                callback(res);
+            }
+        } catch (e) {
+            logger.error('GoogleButton:promptAsync:error >>', e);
         }
-    }, [response]);
-
-    if (!request) {
-        return null;
-    }
+    };
 
     return (
         <View>
@@ -43,6 +48,10 @@ const GoogleButton = () => {
             />
         </View>
     );
+};
+
+GoogleButton.propTypes = {
+    callback: PropTypes.func,
 };
 
 export default GoogleButton;

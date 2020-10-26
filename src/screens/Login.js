@@ -17,6 +17,7 @@ import Container from '../components/Container';
 import SocialLogins from '../components/SocialLogins';
 import ErrorHandler from '../components/ErrorHandler';
 import Divider from '../components/Divider';
+import { logger } from '../utils/LogManager';
 
 const InputStyle = {
     backgroundColor: colors.white,
@@ -171,7 +172,20 @@ export default class Login extends React.Component {
                         />
                         {this.renderButton()}
                         <Divider>OR</Divider>
-                        <SocialLogins />
+                        <SocialLogins
+                            callback={(response) => {
+                                const { navigation } = this.props;
+                                if (!response || response?.status === 'error') {
+                                    this.setState({
+                                        errorMsg: `${response?.errorCode || 0}: ${response?.message || 'Login:SocialLogins:Error: Unknown'}`,
+                                    });
+                                    logger.error('Login:SocialLogins:callback >> ', response);
+                                    return;
+                                }
+                                // else assume success
+                                navigation.navigate('App', { currentUser: response });
+                            }}
+                        />
                         {this.renderErrorMsg()}
                     </Container>
                 </ErrorHandler>

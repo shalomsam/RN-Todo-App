@@ -6,6 +6,7 @@ import Unsplash, { toJson } from 'unsplash-js';
 import { Linking } from 'expo';
 import PropTypes from 'prop-types';
 import { colors, styles, gutter } from '../../utils/styles';
+import { logger } from '../../utils/LogManager';
 
 const UnSplashBg = ({
     searchKeyword = 'landscape + dark',
@@ -60,7 +61,6 @@ const UnSplashBg = ({
 
                     getUnsplashImage()
                         .then((json) => {
-                        // console.log("json.results >>", json.results);
                             setRandomImg(json.results);
 
                             if (json?.results?.length) {
@@ -79,9 +79,9 @@ const UnSplashBg = ({
                             };
 
                             AsyncStorage.setItem(storageKey, storageData)
-                                .catch((e) => console.error(e));
+                                .catch((e) => logger.error(e));
                         })
-                        .catch((e) => console.error('getUnsplashImage >> err >> ', e));
+                        .catch((e) => logger.error('UnsplashBg:getUnsplashImage >> ', e));
                 });
         }
 

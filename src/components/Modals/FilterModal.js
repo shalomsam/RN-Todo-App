@@ -62,6 +62,7 @@ const FilterModal = ({
             transparent
             visible={visible}
             onRequestClose={() => {
+                // eslint-disable-next-line no-console
                 console.log('Modal has been closed.');
             }}
         >

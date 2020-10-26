@@ -19,6 +19,7 @@ import ListsDb from '../database/Lists';
 import SimpleModal from '../components/Modals/SimpleModal';
 import Switch from '../components/SwitchCase/Switch';
 import Buttons from '../components/UI/Buttons';
+import { logger } from '../utils/LogManager';
 
 const localStyles = StyleSheet.create({
     container: {
@@ -83,309 +84,311 @@ export default class Tasks extends React.Component {
         this.setState({ selectedList: list, currentUser });
     }
 
-  save = async () => {
-      const { selectedList, currentUser } = this.state;
-      try {
-          ListsDb.setTodos(selectedList, currentUser.uid);
-      } catch (e) {
-          console.log('Error while storing Todo Items >', e);
-      }
-  };
+    save = async () => {
+        const { selectedList, currentUser } = this.state;
+        try {
+            ListsDb.setTodos(selectedList, currentUser.uid);
+        } catch (e) {
+            logger.error('Tasks:save >>', e);
+        }
+    };
 
-  addTodo = () => {
-      const { todo, selectedList } = this.state;
-      const todos = selectedList.todos || {};
-      if (todo.length === 0) {
-      // this.setState({ inputError: true });
-          return;
-      }
-      const todoKey = md5(todo);
-      const todoNew = {
-          key: todoKey,
-          title: todo,
-          completed: false,
-          createdOn: Date.now(),
-          notes: '',
-          dueDate: null,
-          remindMe: false,
-          completedOn: null,
-      };
+    addTodo = () => {
+        const { todo, selectedList } = this.state;
+        const todos = selectedList.todos || {};
+        if (todo.length === 0) {
+            // this.setState({ inputError: true });
+            return;
+        }
+        const todoKey = md5(todo);
+        const todoNew = {
+            key: todoKey,
+            title: todo,
+            completed: false,
+            createdOn: Date.now(),
+            notes: '',
+            dueDate: null,
+            remindMe: false,
+            completedOn: null,
+        };
 
-      todos[todoKey] = todoNew;
-      selectedList.todos = todos;
-      this.setState({ selectedList, todo: '' }, this.save);
-  };
+        todos[todoKey] = todoNew;
+        selectedList.todos = todos;
+        this.setState({ selectedList, todo: '' }, this.save);
+    };
 
-  checkBoxToggle = (todoKey) => {
-      const { selectedList } = this.state;
-      const { todos } = selectedList;
-      const todo = todos[todoKey];
+    checkBoxToggle = (todoKey) => {
+        const { selectedList } = this.state;
+        const { todos } = selectedList;
+        const todo = todos[todoKey];
 
-      todo.completed = !todo.completed;
-      todo.completedOn = todo.completed ? Date.now() : null;
-      todos[todoKey] = todo;
-      selectedList.todos = todos;
-      this.setState({ selectedList }, this.save);
-  };
+        todo.completed = !todo.completed;
+        todo.completedOn = todo.completed ? Date.now() : null;
+        todos[todoKey] = todo;
+        selectedList.todos = todos;
+        this.setState({ selectedList }, this.save);
+    };
 
-  onDeleteAction = (todoKey) => {
-      const { selectedList } = this.state;
-      delete selectedList.todos[todoKey];
-      this.setState({ selectedList }, this.save);
-  };
+    onDeleteAction = (todoKey) => {
+        const { selectedList } = this.state;
+        delete selectedList.todos[todoKey];
+        this.setState({ selectedList }, this.save);
+    };
 
-  deleteAllContinue = () => {
-      const { selectedList } = this.state;
-      const { todos } = selectedList;
+    deleteAllContinue = () => {
+        const { selectedList } = this.state;
+        const { todos } = selectedList;
 
-      const todoKeys = Object.keys(todos);
-      todoKeys.map((todoKey) => {
-          if (this._shouldDeleteTodo(todos[todoKey])) {
-              delete todos[todoKey];
-          }
+        const todoKeys = Object.keys(todos);
+        todoKeys.map((todoKey) => {
+            if (this._shouldDeleteTodo(todos[todoKey])) {
+                delete todos[todoKey];
+            }
 
-          return null;
-      });
+            return null;
+        });
 
-      selectedList.todos = todos;
-      this.setState({ selectedList, currentFilter: 'all' }, this.save);
-  }
+        selectedList.todos = todos;
+        this.setState({ selectedList, currentFilter: 'all' }, this.save);
+    }
 
-  _shouldDeleteTodo = (todo) => {
-      const { currentFilter } = this.state;
+    _shouldDeleteTodo = (todo) => {
+        const { currentFilter } = this.state;
 
-      return (currentFilter === this.FILTER_ACTIVE && !todo.completed)
-      || (currentFilter === this.FILTER_COMPLETE && todo.completed)
-      || currentFilter === this.FILTER_ALL;
-  }
+        return (currentFilter === this.FILTER_ACTIVE && !todo.completed)
+            || (currentFilter === this.FILTER_COMPLETE && todo.completed)
+            || currentFilter === this.FILTER_ALL;
+    }
 
-  deleteAllCancel = () => {
-      // eslint-disable-next-line no-console
-      console.log('Delete All canceled!');
-  }
+    deleteAllCancel = () => {
+        // eslint-disable-next-line no-console
+        logger.console('Delete All canceled!');
+    }
 
-  selectFilter = (filter) => {
-      this.setState({ currentFilter: filter });
-  }
+    selectFilter = (filter) => {
+        this.setState({ currentFilter: filter });
+    }
 
-  showListOptions = () => {
-      this.setState({ showListOptions: true });
-  }
+    showListOptions = () => {
+        this.setState({ showListOptions: true });
+    }
 
-  deleteList = () => {
-      const { selectedList } = this.state;
-      const { navigation } = this.props;
-      // TodosDb.deleteTodoList(selectedList.key, currentUser.uid);
-      this.deleteListAction(selectedList.key);
-      navigation.navigate('TaskLists');
-  }
+    deleteList = () => {
+        const { selectedList } = this.state;
+        const { navigation } = this.props;
+        // TodosDb.deleteTodoList(selectedList.key, currentUser.uid);
+        this.deleteListAction(selectedList.key);
+        navigation.navigate('TaskLists');
+    }
 
-  updateList = () => {
-      const { selectedList } = this.state;
-      ListsDb.updateTodoList(selectedList);
-      this.setState({ showListOptions: false });
-  }
+    updateList = () => {
+        const { selectedList } = this.state;
+        ListsDb.updateTodoList(selectedList);
+        this.setState({ showListOptions: false });
+    }
 
-  showAddedEmails = () => {
-      const { selectedList } = this.state;
-      const { userEmails } = selectedList;
-      const emailKeys = Object.keys(userEmails);
+    showAddedEmails = () => {
+        const { selectedList } = this.state;
+        const { userEmails } = selectedList;
+        const emailKeys = Object.keys(userEmails);
 
-      return emailKeys.map((emailKey) => {
-          let owner = null;
-          const listUser = userEmails[emailKey];
+        return emailKeys.map((emailKey) => {
+            let owner = null;
+            const listUser = userEmails[emailKey];
 
-          if (listUser.email === selectedList.owner) {
-              owner = <Text>Owner</Text>;
-          }
-          return (
-              <View key={emailKey}>
-                  <Text>
-                      {listUser.email}
-                  </Text>
-                  <Text>
-                      {owner}
-                  </Text>
-              </View>
-          );
-      });
-  }
+            if (listUser.email === selectedList.owner) {
+                owner = <Text>Owner</Text>;
+            }
+            return (
+                <View key={emailKey}>
+                    <Text>
+                        {listUser.email}
+                    </Text>
+                    <Text>
+                        {owner}
+                    </Text>
+                </View>
+            );
+        });
+    }
 
-  addEmailToList = () => {
-      const { selectedList } = this.state;
-      const { userEmails } = selectedList;
-      let { emailInput } = this.state;
-      const emailKey = md5(emailInput);
+    addEmailToList = () => {
+        const { selectedList } = this.state;
+        const { userEmails } = selectedList;
+        let { emailInput } = this.state;
+        const emailKey = md5(emailInput);
 
-      userEmails[emailKey] = this.addUnverifiedUserToList(emailKey, emailInput);
-      selectedList.userEmails = userEmails;
-      ListsDb.updateTodoList(selectedList);
-      emailInput = '';
-      this.setState({ selectedList, emailInput });
-  }
+        userEmails[emailKey] = this.addUnverifiedUserToList(emailKey, emailInput);
+        selectedList.userEmails = userEmails;
+        ListsDb.updateTodoList(selectedList);
+        emailInput = '';
+        this.setState({ selectedList, emailInput });
+    }
 
-  render() {
-      const { navigation } = this.props;
-      const {
-          currentFilter,
-          todo,
-          showListOptions,
-          selectedList,
-          route,
-          emailInput,
-      } = this.state;
-      let { todos } = selectedList;
-      const {
-          DEFAULT,
-          DELETE,
-          RENAME,
-          ADDEMAIL,
-          REMINDER,
-      } = this.listOptions;
+    render() {
+        const { navigation } = this.props;
+        const {
+            currentFilter,
+            todo,
+            showListOptions,
+            selectedList,
+            route,
+            emailInput,
+        } = this.state;
+        let { todos } = selectedList;
+        const {
+            DEFAULT,
+            DELETE,
+            RENAME,
+            ADDEMAIL,
+            REMINDER,
+        } = this.listOptions;
 
-      if (currentFilter !== 'all') {
-          const todoKeys = Object.values(todos);
-          todos = {};
-          todoKeys.map((_todo) => {
-              if ((currentFilter === this.FILTER_ACTIVE && _todo.completed === false)
-          || (currentFilter === this.FILTER_COMPLETE && _todo.completed)) {
-                  todos[_todo.key] = _todo;
-              }
-              return null;
-          });
-      }
+        if (currentFilter !== 'all') {
+            const todoKeys = Object.values(todos);
+            todos = {};
+            todoKeys.map((_todo) => {
+                if ((currentFilter === this.FILTER_ACTIVE && _todo.completed === false)
+                    || (currentFilter === this.FILTER_COMPLETE && _todo.completed)) {
+                    todos[_todo.key] = _todo;
+                }
+                return null;
+            });
+        }
 
-      return (
-          <LinearGradient style={{ flex: 1 }} colors={styles.appBackgroundColors}>
-              <Header
-                  title="Tasks"
-                  backgroundColor="transparent"
-                  iconLeft={(
-                      <FontAwesome
-                          style={styles.headerIconLeft}
-                          name="chevron-left"
-                          size={20}
-                          color="white"
-                          onPress={() => navigation.goBack()}
-                      />
-                  )}
-                  iconRight={(
-                      <MaterialCommunityIcons
-                          style={styles.headerIconRight}
-                          name="arrow-down-bold-box"
-                          size={20}
-                          color="white"
-                          onPress={() => this.showListOptions()}
-                      />
-                  )}
-              />
-              <View style={localStyles.container}>
-                  <TextInput
-                      style={[localStyles.textInput, { color: 'white' }]}
-                      autoCapitalize="sentences"
-                      placeholder="What needs to be done?"
-                      placeholderTextColor="rgba(255, 255, 255, 0.7)"
-                      onChangeText={(input) => this.setState({ todo: input })}
-                      blurOnSubmit={false}
-                      onSubmitEditing={this.addTodo}
-                      value={todo}
-                  />
-                  <View style={localStyles.todosWrp}>
-                      <Filter
-                          filterTitle="Your Todos"
-                          currentFilter={currentFilter}
-                          filterTypes={this.filters}
-                          deleteContinue={this.deleteAllContinue}
-                          deleteCancel={this.deleteAllCancel}
-                          selectFilter={this.selectFilter}
-                      />
-                      <ScrollView>
-                          <Todos
-                              todos={todos}
-                              checkBoxToggle={this.checkBoxToggle}
-                              onDelete={this.onDeleteAction}
-                          />
-                      </ScrollView>
-                  </View>
-              </View>
+        return (
+            <LinearGradient style={{ flex: 1 }} colors={styles.appBackgroundColors}>
+                <Header
+                    title="Tasks"
+                    backgroundColor="transparent"
+                    iconLeft={(
+                        <FontAwesome
+                            style={styles.headerIconLeft}
+                            name="chevron-left"
+                            size={20}
+                            color="white"
+                            onPress={() => navigation.goBack()}
+                        />
+                    )}
+                    iconRight={(
+                        <MaterialCommunityIcons
+                            style={styles.headerIconRight}
+                            name="arrow-down-bold-box"
+                            size={20}
+                            color="white"
+                            onPress={() => this.showListOptions()}
+                        />
+                    )}
+                />
+                <View style={localStyles.container}>
+                    <TextInput
+                        style={[localStyles.textInput, { color: 'white' }]}
+                        autoCapitalize="sentences"
+                        placeholder="What needs to be done?"
+                        placeholderTextColor="rgba(255, 255, 255, 0.7)"
+                        onChangeText={(input) => this.setState({ todo: input })}
+                        blurOnSubmit={false}
+                        onSubmitEditing={this.addTodo}
+                        value={todo}
+                    />
+                    <View style={localStyles.todosWrp}>
+                        <Filter
+                            filterTitle="Your Todos"
+                            currentFilter={currentFilter}
+                            filterTypes={this.filters}
+                            deleteContinue={this.deleteAllContinue}
+                            deleteCancel={this.deleteAllCancel}
+                            selectFilter={this.selectFilter}
+                        />
+                        <ScrollView>
+                            <Todos
+                                todos={todos}
+                                checkBoxToggle={this.checkBoxToggle}
+                                onDelete={this.onDeleteAction}
+                            />
+                        </ScrollView>
+                    </View>
+                </View>
 
-              {/* List Options Modal */}
-              <SimpleModal
-                  title="List Options"
-                  visible={showListOptions}
-                  closeAction={
-                      () => this.setState({
-                          showListOptions: false,
-                          route: this.listOptions.DEFAULT,
-                      })
-                  }
-              >
-                  <Switch route={route}>
-                      {/* DEFAULT */}
-                      <Switch.Case match={DEFAULT}>
-                          <View>
-                              <Buttons
-                                  type="link"
-                                  title="Delete"
-                                  onPress={() => this.setState({ route: this.listOptions.DELETE })}
-                              />
-                          </View>
-                      </Switch.Case>
+                {/* List Options Modal */}
+                <SimpleModal
+                    title="List Options"
+                    visible={showListOptions}
+                    closeAction={
+                        () => this.setState({
+                            showListOptions: false,
+                            route: this.listOptions.DEFAULT,
+                        })
+                    }
+                >
+                    <Switch route={route}>
+                        {/* DEFAULT */}
+                        <Switch.Case match={DEFAULT}>
+                            <View>
+                                <Buttons
+                                    type="link"
+                                    title="Delete"
+                                    onPress={
+                                        () => this.setState({ route: this.listOptions.DELETE })
+                                    }
+                                />
+                            </View>
+                        </Switch.Case>
 
-                      {/* DELETE */}
-                      <Switch.Case match={DELETE}>
-                          <View>
-                              <Text>Are you sure you wanna DELETE this list: </Text>
-                          </View>
-                          <View>
-                              <Buttons
-                                  type="primary"
-                                  title="Yes"
-                                  onPress={this.deleteList}
-                              />
-                          </View>
-                      </Switch.Case>
+                        {/* DELETE */}
+                        <Switch.Case match={DELETE}>
+                            <View>
+                                <Text>Are you sure you wanna DELETE this list: </Text>
+                            </View>
+                            <View>
+                                <Buttons
+                                    type="primary"
+                                    title="Yes"
+                                    onPress={this.deleteList}
+                                />
+                            </View>
+                        </Switch.Case>
 
-                      {/* RENAME */}
-                      <Switch.Case match={RENAME}>
-                          <View>
-                              <Text>List Name</Text>
-                              <TextInput
-                                  placeholder="Enter a name for the list"
-                                  value={selectedList.name}
-                                  onSubmitEditing={this.updateList}
-                              />
-                          </View>
-                      </Switch.Case>
+                        {/* RENAME */}
+                        <Switch.Case match={RENAME}>
+                            <View>
+                                <Text>List Name</Text>
+                                <TextInput
+                                    placeholder="Enter a name for the list"
+                                    value={selectedList.name}
+                                    onSubmitEditing={this.updateList}
+                                />
+                            </View>
+                        </Switch.Case>
 
-                      {/* ADDUSER */}
-                      <Switch.Case match={ADDEMAIL}>
-                          <View>
-                              <Text>Add Users:</Text>
-                          </View>
-                          <View>
-                              {this.showAddedEmails()}
-                          </View>
-                          <View>
-                              <TextInput
-                                  placeholder="Add email"
-                                  value={emailInput}
-                                  onSubmitEditing={this.addEmailToList}
-                              />
-                          </View>
-                      </Switch.Case>
+                        {/* ADDUSER */}
+                        <Switch.Case match={ADDEMAIL}>
+                            <View>
+                                <Text>Add Users:</Text>
+                            </View>
+                            <View>
+                                {this.showAddedEmails()}
+                            </View>
+                            <View>
+                                <TextInput
+                                    placeholder="Add email"
+                                    value={emailInput}
+                                    onSubmitEditing={this.addEmailToList}
+                                />
+                            </View>
+                        </Switch.Case>
 
-                      {/* REMINDER */}
-                      <Switch.Case match={REMINDER}>
-                          <View>
-                              <Text>Reminder:</Text>
-                          </View>
-                      </Switch.Case>
-                  </Switch>
-              </SimpleModal>
-          </LinearGradient>
-      );
-  }
+                        {/* REMINDER */}
+                        <Switch.Case match={REMINDER}>
+                            <View>
+                                <Text>Reminder:</Text>
+                            </View>
+                        </Switch.Case>
+                    </Switch>
+                </SimpleModal>
+            </LinearGradient>
+        );
+    }
 }
 
 Tasks.propTypes = {
