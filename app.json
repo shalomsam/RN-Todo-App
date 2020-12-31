@@ -7,7 +7,8 @@
         "privacy": "public",
         "platforms": [
             "ios",
-            "android"
+            "android",
+            "web"
         ],
         "facebookScheme": "fb320848255809205",
         "version": "0.0.4",

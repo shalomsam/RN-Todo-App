@@ -13,7 +13,8 @@
     "eject": "expo eject",
     "firebase:setup": "./scripts/cli.js init",
     "bumpVersion": "npx standard-version",
-    "commit": "git-cz"
+    "commit": "git-cz",
+    "reset": "watchman watch-del-all && rm -rf node_modules/ && yarn cache clean && yarn install && yarn start -- --reset-cache"
   },
   "dependencies": {
     "@expo/vector-icons": "^10.0.0",

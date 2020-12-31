@@ -3,7 +3,6 @@ import * as WebBrowser from 'expo-web-browser';
 import { makeRedirectUri, startAsync } from 'expo-auth-session';
 import { FontAwesome } from '@expo/vector-icons';
 import { View } from 'react-native';
-import Constants from 'expo-constants';
 import PropTypes from 'prop-types';
 import { colors } from '../../utils/styles';
 import user from '../../database/User';
